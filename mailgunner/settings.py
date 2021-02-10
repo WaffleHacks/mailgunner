@@ -33,9 +33,21 @@ DEBUG = environ.get('DEBUG', 'no') == 'yes'
 
 ALLOWED_HOSTS = ["127.0.0.1", "localhost", environ.get('PUBLIC_URL')]
 
-# HTTPS security additions
-CSRF_COOKIE_SECURE = environ.get('HTTPS', 'no') == 'yes'
-SESSION_COOKIE_SECURE = environ.get('HTTPS', 'no') == 'yes'
+# Secure cookies
+https_enabled = environ.get('HTTPS', 'no') == 'yes'
+CSRF_COOKIE_SECURE = https_enabled
+SESSION_COOKIE_SECURE = https_enabled
+
+# HSTS configuration
+#   enable for 6 months
+#   preload certificates
+#   include subdomains in HSTS
+SECURE_HSTS_SECONDS = 15778800 if https_enabled else None
+SECURE_HSTS_PRELOAD = https_enabled
+SECURE_HSTS_INCLUDE_SUBDOMAINS = https_enabled
+
+# Redirect HTTP to HTTPS
+SECURE_SSL_REDIRECT = https_enabled
 
 
 # Application definition
