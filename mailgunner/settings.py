@@ -37,6 +37,7 @@ ALLOWED_HOSTS = ["127.0.0.1", "localhost", environ.get('PUBLIC_URL')]
 # Application definition
 
 INSTALLED_APPS = [
+    'anymail',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -124,3 +125,14 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 STATIC_URL = '/static/'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+# Mailer configuration
+ANYMAIL = {
+    'MAILGUN_API_KEY': environ.get('MAILGUN_API_KEY'),
+    'MAILGUN_SENDER_DOMAIN': environ.get('MAILGUN_DOMAIN'),
+    'MAILGUN_WEBHOOK_SIGNING_KEY': environ.get('MAILGUN_WEBHOOK_SIGNING_KEY'),
+    'WEBHOOK_SECRET': environ.get('WEBHOOK_SECRET'),
+}
+EMAIL_BACKEND = 'anymail.backends.mailgun.EmailBackend'
+DEFAULT_FROM_EMAIL = 'hello@' + environ.get('MAILGUN_DOMAIN')
+SERVER_EMAIL = 'mailgunner@' + environ.get('MAILGUN_DOMAIN')
