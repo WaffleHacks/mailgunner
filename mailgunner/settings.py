@@ -33,6 +33,10 @@ DEBUG = environ.get('DEBUG', 'no') == 'yes'
 
 ALLOWED_HOSTS = ["127.0.0.1", "localhost", environ.get('PUBLIC_URL')]
 
+# HTTPS security additions
+CSRF_COOKIE_SECURE = environ.get('HTTPS', 'no') == 'yes'
+SESSION_COOKIE_SECURE = environ.get('HTTPS', 'no') == 'yes'
+
 
 # Application definition
 
