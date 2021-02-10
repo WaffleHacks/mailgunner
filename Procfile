@@ -1,1 +1,1 @@
-web: gunicorn -k uvicorn.workers.UvicornWorker mailgunner.asgi:application
+web: gunicorn -k uvicorn.workers.UvicornWorker mailgunner.asgi:application --log-file -
