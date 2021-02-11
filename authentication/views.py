@@ -10,7 +10,7 @@ def login_view(request):
     if request.method == "GET":
         # Redirect if user already authenticated
         if request.user.is_authenticated:
-            return redirect('')
+            return redirect('index')
         return render(request, 'authentication/login.html')
 
     # Get the user reference
@@ -21,7 +21,7 @@ def login_view(request):
     # Login the user
     login(request, user)
 
-    return redirect('')
+    return redirect('index')
 
 
 def logout_view(request):

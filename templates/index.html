@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}MailGunner{% endblock %}
+
+{% block content %}
+<div class="row row-cols-1 row-cols-md-2 g-4">
+    <div class="col">
+        <div class="card shadow rounded">
+            <h3 class="card-header">Received Mail</h3>
+            <div class="card-body">
+                <p class="card-text">Text</p>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card shadow rounded">
+            <h3 class="card-header">Schedule Mail</h3>
+            <div class="card-body">
+                <p class="card-text">Text</p>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card shadow rounded">
+            <h3 class="card-header">Assigned Conversations</h3>
+            <div class="card-body">
+                <p class="card-text">Text</p>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card shadow rounded">
+            <h3 class="card-header">Your Account</h3>
+            <div class="card-body">
+                <p class="card-text">
+                    <a href="#">Settings</a> |
+                    <a href="{% url 'authentication:logout' %}">Logout</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
