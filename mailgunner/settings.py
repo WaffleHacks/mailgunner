@@ -156,5 +156,6 @@ EMAIL_BACKEND = 'anymail.backends.mailgun.EmailBackend'
 DEFAULT_FROM_EMAIL = 'hello@' + environ.get('MAILGUN_DOMAIN')
 SERVER_EMAIL = 'mailgunner@' + environ.get('MAILGUN_DOMAIN')
 
-# Login redirect
+# Login redirects
 LOGIN_URL = 'authentication:login'
+LOGIN_REDIRECT_URL = '/'

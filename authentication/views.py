@@ -14,9 +14,9 @@ def login_view(request):
         return render(request, 'authentication/login.html')
 
     # Get the user reference
-    user = authenticate(request, username=request.POST['username'], password=request.POST['password'])
+    user = authenticate(request, username=request.POST.get('username'), password=request.POST.get('password'))
     if user is None:
-        return render(request, 'authentication/login.html')
+        return render(request, 'authentication/login.html', {'error': 'Invalid username or password'})
 
     # Login the user
     login(request, user)
