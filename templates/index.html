@@ -33,6 +33,7 @@
             <h3 class="card-header">Your Account</h3>
             <div class="card-body">
                 <p class="card-text">
+                    {% if user.is_staff %}<a href="{% url 'admin:index' %}">Admin</a> |{% endif %}
                     <a href="#">Settings</a> |
                     <a href="{% url 'authentication:logout' %}">Logout</a>
                 </p>

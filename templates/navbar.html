@@ -19,6 +19,7 @@
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navDropdownToggle" data-bs-toggle="dropdown" aria-expanded="false">{{ user.get_username }}</a>
                     <ul class="dropdown-menu" aria-labelledby="navDropdownToggle">
+                        {% if user.is_staff %}<li><a class="dropdown-item" href="{% url 'admin:index' %}">Admin</a></li>{% endif%}
                         <li><a class="dropdown-item" href="#">Settings</a></li>
                         <li><a class="dropdown-item" href="{% url 'authentication:logout' %}">Logout</a></li>
                     </ul>
