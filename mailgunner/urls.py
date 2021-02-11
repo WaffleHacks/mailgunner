@@ -17,6 +17,10 @@ from django.contrib import admin
 from django.urls import include, path, re_path
 
 urlpatterns = [
+    # user authentication
+    path('auth/', include('authentication.urls')),
+
+    # Routes from other packages
     path('admin/', admin.site.urls),
     re_path(r'^anymail/', include('anymail.urls')),
 ]

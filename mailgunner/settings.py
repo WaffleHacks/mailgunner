@@ -54,12 +54,14 @@ SECURE_SSL_REDIRECT = https_enabled
 
 INSTALLED_APPS = [
     'anymail',
+    'whitenoise.runserver_nostatic',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'authentication',
 ]
 
 MIDDLEWARE = [
@@ -153,3 +155,6 @@ ANYMAIL = {
 EMAIL_BACKEND = 'anymail.backends.mailgun.EmailBackend'
 DEFAULT_FROM_EMAIL = 'hello@' + environ.get('MAILGUN_DOMAIN')
 SERVER_EMAIL = 'mailgunner@' + environ.get('MAILGUN_DOMAIN')
+
+# Login redirect
+LOGIN_URL = 'authentication:login'
