@@ -27,6 +27,9 @@
 
         <form action="{% url 'authentication:login' %}" method="post">
             {% csrf_token %}
+            {% if request.GET.next %}
+                <input type="hidden" name="next" value="{{ request.GET.next }}">
+            {% endif %}
 
             <label for="username" class="visually-hidden">Username</label>
             <input type="text" id="username" name="username" class="form-control" placeholder="Username" required autofocus>

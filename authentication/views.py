@@ -26,7 +26,12 @@ def login_view(request):
     # Login the user
     login(request, user)
 
-    return redirect('index')
+    # Determine where to redirect the user
+    redirect_to = request.POST.get('next')
+    if redirect_to is None or redirect_to == '':
+        redirect_to = 'index'
+
+    return redirect(redirect_to)
 
 
 @login_required
