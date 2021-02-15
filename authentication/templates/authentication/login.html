@@ -11,11 +11,15 @@
             <input type="hidden" name="next" value="{{ request.GET.next }}">
         {% endif %}
 
-        <label for="username" class="visually-hidden">Username</label>
-        <input type="text" id="username" name="username" class="form-control round-top" placeholder="Username" required autofocus>
+        <div class="form-floating">
+            <input type="text" id="username" name="username" class="form-control round-top" placeholder="Username" required>
+            <label for="username">Username</label>
+        </div>
 
-        <label for="password" class="visually-hidden">Password</label>
-        <input type="password" id="password" name="password" class="form-control round-bottom" placeholder="Password" required>
+        <div class="form-floating">
+            <input type="password" id="password" name="password" class="form-control round-bottom" placeholder="Password" required>
+            <label for="password">Password</label>
+        </div>
 
         <a href="{% url 'authentication:forgot' %}" class="link-secondary mt-3">Forgot your password?</a>
 

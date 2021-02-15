@@ -8,8 +8,10 @@
     <form action="{% url 'authentication:forgot' %}" method="post">
         {% csrf_token %}
 
-        <label for="email" class="visually-hidden">Email</label>
-        <input type="email" id="email" name="email" class="form-control mb-3" placeholder="Email" required autofocus>
+        <div class="form-floating mb-3">
+            <input type="email" id="email" name="email" class="form-control" placeholder="Email" required>
+            <label for="email">Email</label>
+        </div>
 
         <a href="{% url 'authentication:login' %}" class="link-secondary mt-3">Back to login</a>
 
