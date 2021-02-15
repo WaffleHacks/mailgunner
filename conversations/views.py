@@ -1,4 +1,6 @@
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.mail import EmailMessage
 from django.core.files.uploadedfile import TemporaryUploadedFile
 from django.shortcuts import get_object_or_404, redirect, render
@@ -9,7 +11,7 @@ from pathlib import Path
 from .models import Thread
 
 
-class BaseThreadView(ListView):
+class BaseThreadView(LoginRequiredMixin, ListView):
     model = Thread
 
     paginate_by = 25
@@ -30,7 +32,7 @@ class ClaimedView(BaseThreadView):
         return self.model.objects.filter(assignee=self.request.user)
 
 
-class ThreadView(DetailView):
+class ThreadView(LoginRequiredMixin, DetailView):
     model = Thread
     template_name = 'conversations/thread.html'
 
@@ -52,6 +54,7 @@ class ThreadView(DetailView):
         return thread
 
 
+@login_required
 def claim(request, pk):
     """
     Assign a thread to the requester
@@ -74,6 +77,7 @@ def claim(request, pk):
     return redirect('conversations:thread', pk=pk)
 
 
+@login_required
 def unclaim(request, pk):
     """
     Remove a thread from the requester
@@ -98,6 +102,7 @@ def unclaim(request, pk):
     return redirect('conversations:thread', pk=pk)
 
 
+@login_required
 def reply(request, pk):
     """
     Reply to a thread
@@ -146,6 +151,7 @@ def reply(request, pk):
     return redirect('conversations:thread', pk=pk)
 
 
+@login_required
 def delete(request, pk):
     """
     Delete the specified message
@@ -164,6 +170,7 @@ def delete(request, pk):
     return redirect('conversations:unclaimed')
 
 
+@login_required
 def send(request):
     """
     Send a new message (starts a new thread)
