@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block title %}Conversations{% endblock %}
+
+{% block content %}
+    <div class="card w-100">
+        <div class="card-body">
+            <div class="row text-center">
+                <div class="col-md">
+                    <a class="btn btn-outline-secondary" href="{% url 'index' %}">Home</a>
+                </div>
+                <div class="col-md">
+                    {% block switcher %}{% endblock %}
+                </div>
+                <div class="col-md">
+                    <a class="btn btn-outline-success" href="{% url 'conversations:send' %}">New Message</a>
+                </div>
+            </div>
+
+            <br/>
+            <p>
+                {% block header %}{% endblock %}
+                Open a thread by clicking on it where you can then view and reply to it.
+                To switch between claimed and unclaimed threads, use the middle button.
+                You can also send a new message by using the button to the right.
+            </p>
+        </div>
+    </div>
+
+    <br/>
+
+    <div class="list-group">
+        {% for thread in threads %}
+            <a href="{% url 'conversations:thread' thread.pk %}" class="list-group-item list-group-item-action" style="background-color: {% cycle 'white' '#e9e9e9' %}" aria-current="true">
+                <div class="d-flex w-100 justify-content-between">
+                    <h5 class="mb-1">{{ thread.subject }}</h5>
+                    <small>
+                        {% if thread.is_older_than_a_day %}
+                            {{ thread.last_updated|date }},
+                        {% endif %}
+                        {{ thread.last_updated|time:"f A" }}
+                        {% if thread.unread %}<span class="badge bg-success">Unread</span>{% endif %}
+                    </small>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 col-sm-12">
+                        <span class="badge bg-secondary">From</span>
+                        {{ thread.originally_from }}
+                    </div>
+                    <div class="col-md-6 col-sm-12">
+                        <span class="badge bg-primary">To</span>
+                        {{ thread.recipient }}
+                    </div>
+                </div>
+            </a>
+        {% empty %}
+            <div class="card w-100">
+                <div class="card-body">
+                    <p>Hooray! You have no messages, check back later!</p>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <br/>
+
+    <nav aria-label="Page navigation">
+        <ul class="pagination">
+            <li class="page-item"><a class="page-link" href="?page=1" disabled="true">First</a></li>
+
+            {% if page_obj.has_previous %}
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">{{ page_obj.previous_page_number }}</a></li>
+            {% endif %}
+
+            <li class="page-item active" aria-current="page"><span class="page-link">{{ page_obj.number }}</span></li>
+
+            {% if page_obj.has_next %}
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a></li>
+            {% endif %}
+
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Last</a></li>
+        </ul>
+    </nav>
+{% endblock %}

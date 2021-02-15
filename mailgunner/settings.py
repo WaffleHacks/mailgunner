@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
+from django.contrib.messages import constants as messages
 import dj_database_url
 from dotenv import load_dotenv
 from os import environ
@@ -55,13 +56,14 @@ SECURE_SSL_REDIRECT = https_enabled
 INSTALLED_APPS = [
     'anymail',
     'whitenoise.runserver_nostatic',
+    'authentication.apps.AuthenticationConfig',
+    'conversations.apps.IncomingConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'authentication',
 ]
 
 MIDDLEWARE = [
@@ -159,3 +161,17 @@ SERVER_EMAIL = 'mailgunner@' + environ.get('MAILGUN_DOMAIN')
 # Login redirects
 LOGIN_URL = 'authentication:login'
 LOGIN_REDIRECT_URL = '/'
+
+# AWS S3 storage backend configuration
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+AWS_ACCESS_KEY_ID = environ.get('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = environ.get('AWS_SECRET_ACCESS_KEY')
+AWS_STORAGE_BUCKET_NAME = environ.get('AWS_STORAGE_BUCKET_NAME')
+AWS_S3_REGION_NAME = environ.get('AWS_S3_REGION_NAME')
+
+# Custom message levels to match with Bootstrap's colors
+# Only debug and error need to be changed since the rest match with Bootstrap
+MESSAGE_TAGS = {
+    messages.DEBUG: 'secondary',
+    messages.ERROR: 'danger',
+}

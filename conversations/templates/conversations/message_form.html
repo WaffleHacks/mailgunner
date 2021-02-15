@@ -1,0 +1,76 @@
+{% load static %}
+{% load conversations_extras %}
+
+<script src="{% static 'conversations/message-form.js' %}"></script>
+
+{% csrf_token %}
+
+<div class="row g-2 mb-3">
+    <div class="col-md">
+        <div class="form-floating">
+            <input type="text" id="name" name="name" class="form-control" placeholder="Your name" value="{{ user.get_full_name }}" required>
+            <label for="name">From Name</label>
+        </div>
+    </div>
+    <div class="col-md">
+        <div class="input-group">
+            <div class="form-floating">
+                <input type="text" id="email" name="email" class="form-control" placeholder="{{ user.username }}" value="{{ user.username }}" required>
+                <label for="email">From Email</label>
+            </div>
+            <span class="input-group-text" id="email-tld">@wafflehacks.tech</span>
+        </div>
+    </div>
+</div>
+
+<div class="row g-2 mb-3">
+    <div class="col-md">
+        <div class="form-floating {% if not new_message %}w-50{% endif %}">
+            {% if new_message %}
+                <input type="text" id="subject" name="subject" class="form-control" placeholder="Subject" required>
+            {% elif last_message.subject|lower|startswith:"re:" %}
+                <input type="text" id="subject" name="subject" class="form-control" placeholder="{{ last_message.subject }}" value="{{ last_message.subject }}" required>
+            {% else %}
+                <input type="text" id="subject" name="subject" class="form-control" placeholder="{{ last_message.subject }}" value="Re: {{ last_message.subject }}" required>
+            {% endif %}
+            <label for="subject">Subject</label>
+        </div>
+    </div>
+    {% if new_message %}
+        <div class="col-md">
+            <div class="form-floating">
+                <input type="text" id="to" name="to" class="form-control" placeholder="To" required>
+                <label for="to">To</label>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<div class="form-floating mb-3">
+    <textarea class="form-control" style="height: 16rem" id="body" name="body" placeholder="Enter your reply's content" required></textarea>
+    <label for="body">Message</label>
+</div>
+
+<details>
+    <summary>Attachments</summary>
+    <div class="card card-body w-100">
+        <ul class="list-group list-group-flush" id="attachment-list">
+            <li class="list-group-item" id="attachment-1">
+                <div class="row">
+                    <div class="col-md-10 col-sm-12">
+                        <input class="form-control" type="file" name="attachment-1">
+                    </div>
+                    <div class="col-md-2 col-sm-12">
+                        <button type="button" class="btn btn-outline-danger" id="remove-attachment-1">Remove</button>
+                    </div>
+                </div>
+            </li>
+        </ul>
+        <button type="button" class="btn btn-outline-primary" id="add-attachment">Add Another Attachment</button>
+    </div>
+</details>
+
+<br/>
+
+<button type="button" class="btn btn-outline-secondary" id="message-cancel">Cancel</button>
+<input class="btn btn-success" type="submit" value="Send">

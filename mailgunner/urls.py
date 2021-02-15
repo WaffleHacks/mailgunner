@@ -25,7 +25,10 @@ urlpatterns = [
     # user authentication
     path('auth/', include('authentication.urls')),
 
+    # conversations mail
+    path('conversations/', include('conversations.urls')),
+
     # Routes from other packages
     path('admin/', admin.site.urls),
-    re_path(r'^anymail/', include('anymail.urls')),
+    re_path(r'^webhooks/', include('anymail.urls')),
 ]

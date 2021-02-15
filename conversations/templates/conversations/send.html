@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block title %}New Message{% endblock %}
+
+{% block content %}
+    <div class="card w-100">
+        <div class="card-body">
+            <h4 class="card-title">New Message:</h4>
+            <p class="card-text">
+                Type your message, the subject, and who it is to in the text boxes below.
+                You may be able to use HTML (it hasn't been tested yet), but keep in mind that not all email apps support it.
+                For convenience, your email and name are filled in by default, but you can change them to anything you'd like.
+            </p>
+            <p class="card-text">
+                In the <code>To</code> field, you can either enter just the email or a name and the corresponding email.
+                <pre>
+Email only:         example@test.com
+Email with name:    Example Test &lt;example@test.com&gt;
+                </pre>
+            <b>NOTE:</b> you cannot send to multiple people at this time.
+            <br/>
+            <b>NOTE:</b> you will need to claim the thread once it is sent as auto-claiming is not yet implemented.
+            </p>
+        </div>
+    </div>
+    <br/>
+    <div class="card w-100">
+        <div class="card-body">
+            <form action="{% url 'conversations:send' %}" method="post" enctype="multipart/form-data">
+                {% include 'conversations/message_form.html' %}
+            </form>
+        </div>
+    </div>
+{% endblock %}

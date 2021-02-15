@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+
+{% block title %}Thread {{ thread.pk }}{% endblock %}
+
+{% block content %}
+    <div class="card w-100 h-100">
+        <div class="card-body align-self-center mt-1">
+            <a class="btn btn-primary" href="{% url 'conversations:reply' thread.pk %}">Reply</a>
+            {% if not thread.assignee %}
+                <a class="btn btn-success" href="{% url 'conversations:claim' thread.pk %}">Claim</a>
+            {% else %}
+                <a class="btn btn-outline-warning" href="{% url 'conversations:unclaim' thread.pk %}">Unclaim</a>
+            {% endif %}
+            <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#delete-modal">
+                Delete Thread
+            </button>
+        </div>
+    </div>
+
+    {% for message in thread.message_set.all %}
+        <div class="card w-100 mt-3">
+            <div class="card-header">
+                <h5 class="card-header-title">{{ message.subject }}</h5>
+                <div class="row">
+                    <div class="col-md-6 col-sm-12">
+                        <span class="badge bg-secondary">From</span>
+                        {{ message.from_name }} &lt;{{ message.from_email }}&gt;
+                    </div>
+                    <div class="col-md-6 col-sm-12">
+                        <span class="badge bg-primary">To</span>
+                        {{ message.to }}
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <pre class="card-text">{{ message.text }}</pre>
+            </div>
+            <div class="card-footer">
+                {% with attachments=message.attachment_.all %}
+                    {% if attachments|length != 0 %}
+                        <ul class="list-group list-group-flush">
+                            {% for attachment in attachments %}
+                                <li class="list-group-item">
+                                    {% if attachment.inline %}
+                                        <span class="badge bg-success">Inline</span>
+                                    {% endif %}
+                                    <a class="list-group-item-action" target="_blank" href="{{ attachment.content.url }}">
+                                        {{ attachment.name }}
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                {% endwith %}
+                <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="collapse" data-bs-target="#view-source-{{ message.pk }}" aria-expanded="false" aria-controls="view-source-{{ message.pk }}">
+                    View Source
+                </button>
+                <div class="collapse" id="view-source-{{ message.pk }}">
+                    <pre>
+
+Message ID: {{ message.pk }}
+Sender: {{ message.sender_email }}
+Recipient: {{ message.recipient_email }}
+Received-At: {{ message.timestamp|date:'c' }}
+
+From: {{ message.from_name }} &lt;{{ message.from_email }}&gt;
+To: {{ message.to }}
+{% if message.cc|length != 0 %}CC: {{ message.cc }}
+{% endif %}
+Subject: {{ message.subject }}
+
+{{ message.text }}
+                    </pre>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
+    <br/>
+    {% if thread.assignee == user %}
+        <a class="btn btn-outline-secondary" href="{% url 'conversations:claimed' %}">Back</a>
+    {% else %}
+        <a class="btn btn-outline-secondary" href="{% url 'conversations:unclaimed' %}">Back</a>
+    {% endif %}
+
+    <div class="modal fade" id="delete-modal" tabindex="-1" aria-labelledby="delete-modal-label" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="delete-modal-label">Delete Thread</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete this thread? This action is <b>irreversible</b>!
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Cancel</button>
+                    <a class="btn btn-outline-danger" href="{% url 'conversations:delete' thread.pk %}">Confrim</a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Reply to Thread {{ thread.pk }}{% endblock %}
+
+{% block content %}
+    <div class="card w-100">
+        <div class="card-body">
+            <h4 class="card-title">Replying to {{ last_message.from_name }} &lt;{{ last_message.from_email }}&gt;:</h4>
+            <p class="card-text">
+                Type your reply in the text box below.
+                You may be able to use HTML (it hasn't been tested yet), but keep in mind that not all email apps support it.
+                For convenience, your email and name are filled in by default, but you can change them to anything you'd like.
+                Similarly, the subject is automatically prepended with <code>Re:</code> so you don't have to, but you can still change the subject if you'd like.
+            </p>
+        </div>
+    </div>
+    <br/>
+    <div class="card w-100">
+        <div class="card-body">
+            <form action="{% url 'conversations:reply' thread.pk %}" method="post" enctype="multipart/form-data">
+                {% include 'conversations/message_form.html' %}
+            </form>
+        </div>
+    </div>
+{% endblock %}
