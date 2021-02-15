@@ -29,12 +29,12 @@ body {
 .form-center .form-control:focus {
     z-index: 2;
 }
-.form-center input[type="text"] {
+.form-center .round-top {
     margin-bottom: -1px;
     border-bottom-right-radius: 0;
     border-bottom-left-radius: 0;
 }
-.form-center input[type="password"] {
+.form-center .round-bottom {
     margin-bottom: 10px;
     border-top-left-radius: 0;
     border-top-right-radius: 0;

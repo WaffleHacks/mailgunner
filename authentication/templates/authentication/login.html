@@ -12,12 +12,12 @@
         {% endif %}
 
         <label for="username" class="visually-hidden">Username</label>
-        <input type="text" id="username" name="username" class="form-control" placeholder="Username" required autofocus>
+        <input type="text" id="username" name="username" class="form-control round-top" placeholder="Username" required autofocus>
 
         <label for="password" class="visually-hidden">Password</label>
-        <input type="password" id="password" name="password" class="form-control" placeholder="Password" required>
+        <input type="password" id="password" name="password" class="form-control round-bottom" placeholder="Password" required>
 
-        <a href="#" class="link-secondary mt-3">Forgot your password?</a>
+        <a href="{% url 'authentication:forgot' %}" class="link-secondary mt-3">Forgot your password?</a>
 
         <input class="w-100 btn btn-lg btn-primary mt-3" type="submit" value="Sign in">
     </form>

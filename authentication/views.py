@@ -1,10 +1,19 @@
+from django.conf import settings as django_settings
 from django.contrib import messages
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.password_validation import validate_password
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
+from django.urls import reverse
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.shortcuts import redirect, render
+
+User = get_user_model()
+generator = PasswordResetTokenGenerator()
 
 
 def login_view(request):
@@ -21,7 +30,8 @@ def login_view(request):
     # Get the user reference
     user = authenticate(request, username=request.POST.get('username'), password=request.POST.get('password'))
     if user is None:
-        return render(request, 'authentication/login.html', {'error': 'Invalid username or password'})
+        messages.error(request, 'Invalid username or password')
+        return render(request, 'authentication/login.html')
 
     # Login the user
     login(request, user)
@@ -32,6 +42,103 @@ def login_view(request):
         redirect_to = 'index'
 
     return redirect(redirect_to)
+
+
+def forgot_password(request):
+    """
+    Begin the password reset flow for a user
+    """
+    # Display the form
+    if request.method == "GET":
+        # Redirect if already authenticated
+        if request.user.is_authenticated:
+            return redirect('index')
+        return render(request, 'authentication/forgot.html')
+
+    # Ensure an email is provided
+    email = request.POST.get('email')
+    if email is None or email == '':
+        messages.error(request, 'You must provide your email')
+        return redirect('authentication:forgot')
+
+    # Attempt to find a user by email
+    try:
+        user = User.objects.get(email=email)
+    except User.DoesNotExist:
+        # Fail silently
+        # Give no indication of an account existing
+        messages.success(request, 'An password reset mail has been sent if an account exists with that email')
+        return redirect('authentication:forgot')
+
+    # Generate a reset token
+    uid = urlsafe_base64_encode(force_bytes(user.pk))
+    token = generator.make_token(user)
+
+    # Generate the reset url
+    site = get_current_site(request)
+    path = reverse('authentication:reset', kwargs={'uid': uid, 'token': token})
+    scheme = 'https' if django_settings.HTTPS else 'http'
+    reset_url = f"{scheme}://{site.domain}{path}"
+
+    # Send the reset email
+    user.email_user("Reset your password", f"Hi {user.first_name},\n"
+                                           f"Use the following link to reset your password:\n"
+                                           f"{reset_url}\n\n"
+                                           f"If you did not recently attempt to reset your password, "
+                                           f"you can safely ignore this message.")
+
+    messages.success(request, 'You should receive a password reset email shortly, if an account exists with that email')
+    return redirect('authentication:forgot')
+
+
+def reset_password(request, uid, token):
+    """
+    Complete the password reset flow
+    """
+    # Attempt to find the user
+    try:
+        decoded_uid = urlsafe_base64_decode(uid).decode()
+        user = User.objects.get(pk=decoded_uid)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist, ValidationError):
+        messages.error(request, 'This reset link has already been used')
+        return redirect('authentication:login')
+
+    # Validate the reset token
+    if not generator.check_token(user, token):
+        messages.error(request, 'This reset link has already been used')
+        return redirect('authentication:login')
+
+    # Render the template
+    if request.method == "GET":
+        return render(request, 'authentication/reset.html', {'uid': uid, 'token': token})
+
+    # Get passwords from request
+    password = request.POST.get('password')
+    confirmation = request.POST.get('password-confirm')
+
+    # Ensure passwords present and match
+    if password is None or confirmation is None:
+        messages.error(request, 'Passwords are blank or do not match')
+        return redirect('authentication:reset', uid=uid, token=token)
+    elif password != confirmation:
+        messages.error(request, 'Passwords do not match')
+        return redirect('authentication:reset', uid=uid, token=token)
+
+    # Validate password
+    try:
+        validate_password(password, user)
+    except ValidationError as e:
+        for error in e.messages:
+            messages.error(request, error
+                           .replace('This password', 'Your password')
+                           .replace('The password', 'Your password'))
+        return redirect('authentication:reset', uid=uid, token=token)
+
+    # Set the password
+    user.set_password(password)
+    user.save()
+
+    return redirect('authentication:login')
 
 
 @login_required

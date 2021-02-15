@@ -1,0 +1,18 @@
+{% extends 'authentication/base.html' %}
+
+{% block title %}Forgot Password{% endblock %}
+
+{% block content %}
+    <h1 class="h4 mb-3 fw-normal">Reset your password</h1>
+
+    <form action="{% url 'authentication:forgot' %}" method="post">
+        {% csrf_token %}
+
+        <label for="email" class="visually-hidden">Email</label>
+        <input type="email" id="email" name="email" class="form-control mb-3" placeholder="Email" required autofocus>
+
+        <a href="{% url 'authentication:login' %}" class="link-secondary mt-3">Back to login</a>
+
+        <input class="w-100 btn btn-lg btn-primary mt-3" type="submit" value="Reset password">
+    </form>
+{% endblock %}
