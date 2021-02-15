@@ -13,7 +13,7 @@
         </div>
     </div>
 
-    <form action="{% url 'authentication:settings' %}" method="post">
+    <form action="{% url 'account:settings' %}" method="post">
         {% csrf_token %}
         <input type="hidden" name="type" value="general">
 
@@ -54,7 +54,7 @@
         </div>
     </form>
 
-    <form action="{% url 'authentication:settings' %}" method="post">
+    <form action="{% url 'account:settings' %}" method="post">
         {% csrf_token %}
         <input type="hidden" name="type" value="password">
 

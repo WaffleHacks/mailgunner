@@ -23,7 +23,7 @@ urlpatterns = [
     path('', views.index, name='index'),
 
     # user authentication
-    path('authentication/', include('authentication.urls')),
+    path('account/', include('account.urls')),
 
     # conversations mail
     path('conversations/', include('conversations.urls')),

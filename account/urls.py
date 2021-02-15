@@ -2,7 +2,7 @@ from django.urls import path
 
 from . import views
 
-app_name = 'authentication'
+app_name = 'account'
 urlpatterns = [
     path('forgot', views.forgot_password, name='forgot'),
     path('reset/<str:uid>/<str:token>', views.reset_password, name='reset'),

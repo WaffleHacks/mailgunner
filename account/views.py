@@ -18,20 +18,20 @@ generator = PasswordResetTokenGenerator()
 
 def login_view(request):
     """
-    Display and handle user authentication
+    Display and handle user account
     """
     # Display the form
     if request.method == "GET":
         # Redirect if user already authenticated
         if request.user.is_authenticated:
             return redirect('index')
-        return render(request, 'authentication/login.html')
+        return render(request, 'account/login.html')
 
     # Get the user reference
     user = authenticate(request, username=request.POST.get('username'), password=request.POST.get('password'))
     if user is None:
         messages.error(request, 'Invalid username or password')
-        return render(request, 'authentication/login.html')
+        return redirect('account:login')
 
     # Login the user
     login(request, user)
@@ -53,13 +53,13 @@ def forgot_password(request):
         # Redirect if already authenticated
         if request.user.is_authenticated:
             return redirect('index')
-        return render(request, 'authentication/forgot.html')
+        return render(request, 'account/forgot.html')
 
     # Ensure an email is provided
     email = request.POST.get('email')
     if email is None or email == '':
         messages.error(request, 'You must provide your email')
-        return redirect('authentication:forgot')
+        return redirect('account:forgot')
 
     # Attempt to find a user by email
     try:
@@ -68,7 +68,7 @@ def forgot_password(request):
         # Fail silently
         # Give no indication of an account existing
         messages.success(request, 'An password reset mail has been sent if an account exists with that email')
-        return redirect('authentication:forgot')
+        return redirect('account:forgot')
 
     # Generate a reset token
     uid = urlsafe_base64_encode(force_bytes(user.pk))
@@ -76,7 +76,7 @@ def forgot_password(request):
 
     # Generate the reset url
     site = get_current_site(request)
-    path = reverse('authentication:reset', kwargs={'uid': uid, 'token': token})
+    path = reverse('account:reset', kwargs={'uid': uid, 'token': token})
     scheme = 'https' if django_settings.HTTPS else 'http'
     reset_url = f"{scheme}://{site.domain}{path}"
 
@@ -88,7 +88,7 @@ def forgot_password(request):
                                            f"you can safely ignore this message.")
 
     messages.success(request, 'You should receive a password reset email shortly, if an account exists with that email')
-    return redirect('authentication:forgot')
+    return redirect('account:forgot')
 
 
 def reset_password(request, uid, token):
@@ -101,16 +101,16 @@ def reset_password(request, uid, token):
         user = User.objects.get(pk=decoded_uid)
     except (TypeError, ValueError, OverflowError, User.DoesNotExist, ValidationError):
         messages.error(request, 'This reset link has already been used')
-        return redirect('authentication:login')
+        return redirect('account:login')
 
     # Validate the reset token
     if not generator.check_token(user, token):
         messages.error(request, 'This reset link has already been used')
-        return redirect('authentication:login')
+        return redirect('account:login')
 
     # Render the template
     if request.method == "GET":
-        return render(request, 'authentication/reset.html', {'uid': uid, 'token': token})
+        return render(request, 'account/reset.html', {'uid': uid, 'token': token})
 
     # Get passwords from request
     password = request.POST.get('password')
@@ -119,10 +119,10 @@ def reset_password(request, uid, token):
     # Ensure passwords present and match
     if password is None or confirmation is None:
         messages.error(request, 'Passwords are blank or do not match')
-        return redirect('authentication:reset', uid=uid, token=token)
+        return redirect('account:reset', uid=uid, token=token)
     elif password != confirmation:
         messages.error(request, 'Passwords do not match')
-        return redirect('authentication:reset', uid=uid, token=token)
+        return redirect('account:reset', uid=uid, token=token)
 
     # Validate password
     try:
@@ -132,13 +132,13 @@ def reset_password(request, uid, token):
             messages.error(request, error
                            .replace('This password', 'Your password')
                            .replace('The password', 'Your password'))
-        return redirect('authentication:reset', uid=uid, token=token)
+        return redirect('account:reset', uid=uid, token=token)
 
     # Set the password
     user.set_password(password)
     user.save()
 
-    return redirect('authentication:login')
+    return redirect('account:login')
 
 
 @login_required
@@ -148,7 +148,7 @@ def settings(request):
     """
     # Display the form
     if request.method == "GET":
-        return render(request, 'authentication/settings.html')
+        return render(request, 'account/settings.html')
 
     # Determine the type of modification
     change_type = request.POST.get("type")
@@ -164,10 +164,10 @@ def settings(request):
         # Validate passwords
         if password is None or confirmation is None:
             messages.error(request, "Passwords are blank or do not match")
-            return redirect('authentication:settings')
+            return redirect('account:settings')
         elif password != confirmation:
             messages.error(request, "Passwords must match")
-            return redirect('authentication:settings')
+            return redirect('account:settings')
 
         # Ensure the password is valid
         try:
@@ -177,7 +177,7 @@ def settings(request):
                 messages.error(request, error
                                .replace('This password', 'Your password')
                                .replace('The password', 'Your password'))
-            return redirect('authentication:settings')
+            return redirect('account:settings')
 
         # Set the new password
         user.set_password(password)
@@ -209,7 +209,7 @@ def settings(request):
         except IntegrityError:
             messages.error(request, "That username is already in use")
 
-    return redirect('authentication:settings')
+    return redirect('account:settings')
 
 
 def logout_view(request):
@@ -217,4 +217,4 @@ def logout_view(request):
     Logout a user and redirect them to the login page
     """
     logout(request)
-    return redirect('authentication:login')
+    return redirect('account:login')

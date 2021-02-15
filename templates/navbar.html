@@ -20,8 +20,8 @@
                     <a class="nav-link dropdown-toggle" href="#" id="navDropdownToggle" data-bs-toggle="dropdown" aria-expanded="false">{{ user.get_username }}</a>
                     <ul class="dropdown-menu" aria-labelledby="navDropdownToggle">
                         {% if user.is_staff %}<li><a class="dropdown-item" href="{% url 'admin:index' %}">Admin</a></li>{% endif%}
-                        <li><a class="dropdown-item" href="{% url 'authentication:settings' %}">Settings</a></li>
-                        <li><a class="dropdown-item" href="{% url 'authentication:logout' %}">Logout</a></li>
+                        <li><a class="dropdown-item" href="{% url 'account:settings' %}">Settings</a></li>
+                        <li><a class="dropdown-item" href="{% url 'account:logout' %}">Logout</a></li>
                     </ul>
                 </li>
             </ul>

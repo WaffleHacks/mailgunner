@@ -1,11 +1,11 @@
-{% extends 'authentication/base.html' %}
+{% extends 'account/base.html' %}
 
 {% block title %}Login{% endblock %}
 
 {% block content %}
     <h1 class="h4 mb-3 fw-normal">Please sign in</h1>
 
-    <form action="{% url 'authentication:login' %}" method="post">
+    <form action="{% url 'account:login' %}" method="post">
         {% csrf_token %}
         {% if request.GET.next %}
             <input type="hidden" name="next" value="{{ request.GET.next }}">
@@ -21,7 +21,7 @@
             <label for="password">Password</label>
         </div>
 
-        <a href="{% url 'authentication:forgot' %}" class="link-secondary mt-3">Forgot your password?</a>
+        <a href="{% url 'account:forgot' %}" class="link-secondary mt-3">Forgot your password?</a>
 
         <input class="w-100 btn btn-lg btn-primary mt-3" type="submit" value="Sign in">
     </form>

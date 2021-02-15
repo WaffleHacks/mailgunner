@@ -1,11 +1,11 @@
-{% extends 'authentication/base.html' %}
+{% extends 'account/base.html' %}
 
 {% block title %}Change Password{% endblock %}
 
 {% block content %}
     <h1 class="h4 mb-3 fw-normal">Change your password</h1>
 
-    <form action="{% url 'authentication:reset' uid=uid token=token %}" method="post">
+    <form action="{% url 'account:reset' uid=uid token=token %}" method="post">
         {% csrf_token %}
 
         <div class="form-floating">

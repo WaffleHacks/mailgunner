@@ -56,7 +56,7 @@ SECURE_SSL_REDIRECT = HTTPS
 INSTALLED_APPS = [
     'anymail',
     'whitenoise.runserver_nostatic',
-    'authentication.apps.AuthenticationConfig',
+    'account.apps.AuthenticationConfig',
     'conversations.apps.IncomingConfig',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -170,7 +170,7 @@ DEFAULT_FROM_EMAIL = 'hello@' + environ.get('MAILGUN_DOMAIN')
 SERVER_EMAIL = 'mailgunner@' + environ.get('MAILGUN_DOMAIN')
 
 # Login redirects
-LOGIN_URL = 'authentication:login'
+LOGIN_URL = 'account:login'
 LOGIN_REDIRECT_URL = '/'
 
 # AWS S3 storage backend configuration
