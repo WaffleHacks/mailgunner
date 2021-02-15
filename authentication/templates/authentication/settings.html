@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block title %}Settings{% endblock %}
+
+{% block content %}
+    <div class="card w-100">
+        <div class="card-body">
+            <h3 class="card-title">Settings</h3>
+            <p>
+                You can change your username, email, name, and password here.
+                Keep in mind: if you change your password, you will have to login again.
+            </p>
+        </div>
+    </div>
+
+    <form action="{% url 'authentication:settings' %}" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="type" value="general">
+
+        <div class="card w-100 mt-3">
+            <div class="card-body">
+                <h5 class="card-title">General</h5>
+                <div class="row mb-3">
+                    <div class="col-md">
+                        <div class="form-floating">
+                            <input type="text" class="form-control" id="first-name" name="first-name" placeholder="{{ user.first_name }}" value="{{ user.first_name }}">
+                            <label for="first-name">First Name</label>
+                        </div>
+                    </div>
+                    <div class="col-md">
+                        <div class="form-floating">
+                            <input type="text" class="form-control" id="last-name" name="last-name" placeholder="{{ user.last_name }}" value="{{ user.last_name }}">
+                            <label for="last-name">Last Name</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md">
+                        <div class="form-floating">
+                            <input type="text" class="form-control" id="username" name="username" placeholder="{{ user.username }}" value="{{ user.username }}">
+                            <label for="username">Username</label>
+                        </div>
+                    </div>
+                    <div class="col-md">
+                        <div class="form-floating">
+                            <input type="email" class="form-control" id="email" name="email" placeholder="{{ user.email }}" value="{{ user.email }}">
+                            <label for="email">Email</label>
+                        </div>
+                    </div>
+                </div>
+
+                <input type="submit" class="btn btn-primary" value="Save">
+            </div>
+        </div>
+    </form>
+
+    <form action="{% url 'authentication:settings' %}" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="type" value="password">
+
+        <div class="card w-100 mt-3">
+            <div class="card-body">
+                <h5 class="card-title">Password</h5>
+                <div class="row mb-3">
+                    <div class="col-md">
+                        <div class="form-floating">
+                            <input type="password" class="form-control" id="password" name="password" placeholder="Password" required>
+                            <label for="password">New Password</label>
+                        </div>
+                    </div>
+                    <div class="col-md">
+                        <div class="form-floating">
+                            <input type="password" class="form-control" id="password-confirm" name="password-confirm" placeholder="Confirm Password" required>
+                            <label for="password-confirm">Confirm Password</label>
+                        </div>
+                    </div>
+                </div>
+
+                <input type="submit" class="btn btn-primary" value="Save">
+            </div>
+        </div>
+    </form>
+
+    <a class="btn btn-outline-secondary mt-3" href="{% url 'index' %}">Back</a>
+{% endblock %}
