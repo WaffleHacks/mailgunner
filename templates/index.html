@@ -8,10 +8,14 @@
         <div class="card shadow rounded">
             <h3 class="card-header">Conversations</h3>
             <div class="card-body">
-                <p class="card-text">
-                    <a href="{% url 'conversations:unclaimed' %}">Unclaimed</a> |
-                    <a href="{% url 'conversations:claimed' %}">Your Threads</a>
-                </p>
+                <div class="row text-center m-0 p-0">
+                    <div class="col-md">
+                        <a href="{% url 'conversations:unclaimed' %}">Unclaimed</a>
+                    </div>
+                    <div class="col-md">
+                        <a href="{% url 'conversations:claimed' %}">Your Threads</a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -19,7 +23,11 @@
         <div class="card shadow rounded">
             <h3 class="card-header">Schedule Mail</h3>
             <div class="card-body">
-                <p class="card-text">Text</p>
+                <div class="row text-center m-0 p-0">
+                    <div class="col-md">
+                        <a href="#">Unimplemented</a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -27,11 +35,19 @@
         <div class="card shadow rounded">
             <h3 class="card-header">Your Account</h3>
             <div class="card-body">
-                <p class="card-text">
-                    {% if user.is_staff %}<a href="{% url 'admin:index' %}">Admin</a> |{% endif %}
-                    <a href="#">Settings</a> |
-                    <a href="{% url 'authentication:logout' %}">Logout</a>
-                </p>
+                <div class="row text-center m-0 p-0">
+                    {% if user.is_staff %}
+                        <div class="col-md">
+                            <a href="{% url 'admin:index' %}">Admin</a>
+                        </div>
+                    {% endif %}
+                    <div class="col-md">
+                        <a href="#">Settings (Unimplemented)</a>
+                    </div>
+                    <div class="col-md">
+                        <a href="{% url 'authentication:logout' %}">Logout</a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
