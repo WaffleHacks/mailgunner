@@ -5,6 +5,7 @@ from django.core.mail import EmailMessage
 from django.core.files.uploadedfile import TemporaryUploadedFile
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic import DetailView, ListView
+from email.utils import getaddresses
 import magic
 from pathlib import Path
 
@@ -210,6 +211,17 @@ def send(request):
     return redirect("conversations:unclaimed")
 
 
+def format_address(parts):
+    """
+    Format a parsed email address for sending
+    :param parts: a tuple of the name and email
+    :return: a properly formatted email
+    """
+    if parts[0] == "":
+        return parts[1]
+    return f"{parts[0]} <{parts[1]}>"
+
+
 def dispatch_message(
     request,
     from_name: str,
@@ -258,11 +270,15 @@ def dispatch_message(
         )
         return False
 
+    # Parse the To email(s)
+    addresses = getaddresses(to.split(","))
+    formatted = list(map(format_address, addresses))
+
     # Build the message
     message = EmailMessage(
         subject=subject,
         body=body,
-        to=[to],
+        to=formatted,
         from_email=f"{from_name} <{from_email}@wafflehacks.tech>",
     )
 
