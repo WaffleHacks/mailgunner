@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 from django.contrib.messages import constants as messages
 import dj_database_url
 from dotenv import load_dotenv
+from json import loads as parse_json
 from os import environ
 from pathlib import Path
 
@@ -167,7 +168,7 @@ ANYMAIL = {
     'WEBHOOK_SECRET': environ.get('WEBHOOK_SECRET'),
 }
 EMAIL_BACKEND = 'anymail.backends.mailgun.EmailBackend'
-DEFAULT_FROM_EMAIL = 'hello@' + environ.get('MAILGUN_DOMAIN')
+DEFAULT_FROM_EMAIL = 'no-reply@' + environ.get('MAILGUN_DOMAIN')
 SERVER_EMAIL = 'mailgunner@' + environ.get('MAILGUN_DOMAIN')
 
 # Login redirects
@@ -187,3 +188,10 @@ MESSAGE_TAGS = {
     messages.DEBUG: 'secondary',
     messages.ERROR: 'danger',
 }
+
+# Load application admins
+ADMINS = []
+admin_name = environ.get('ADMIN_NAME')
+admin_email = environ.get('ADMIN_EMAIL')
+if admin_name is not None and admin_email is not None:
+    ADMINS.append((admin_name, admin_email))
