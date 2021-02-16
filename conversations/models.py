@@ -9,8 +9,11 @@ class Thread(models.Model):
     """
     A chain of replies for messages linked by the 'References', 'Message-Id', and 'In-Reply-To' headers
     """
+
     # Who the thread is assigned to
-    assignee = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, blank=True, null=True)
+    assignee = models.ForeignKey(
+        get_user_model(), on_delete=models.CASCADE, blank=True, null=True
+    )
 
     # The subject line of the original message
     subject = models.CharField(max_length=255)
@@ -28,7 +31,7 @@ class Thread(models.Model):
     unread = models.BooleanField()
 
     def __str__(self):
-        return f"<Thread pk={self.pk} originally_from=\"{self.originally_from}\" last_updated=\"{self.recipient}\""
+        return f'<Thread pk={self.pk} originally_from="{self.originally_from}" last_updated="{self.recipient}"'
 
     def is_older_than_a_day(self):
         """
@@ -38,13 +41,14 @@ class Thread(models.Model):
         return difference.days >= 1
 
     class Meta:
-        ordering = ['-last_updated']
+        ordering = ["-last_updated"]
 
 
 class MessageType(models.IntegerChoices):
     """
     The type of message
     """
+
     INCOMING = 0
     OUTGOING = 1
 
@@ -53,6 +57,7 @@ class Message(models.Model):
     """
     A message that was either sent or received
     """
+
     # The type of message
     type = models.IntegerField(choices=MessageType.choices)
 
@@ -85,7 +90,7 @@ class Message(models.Model):
     thread = models.ForeignKey(Thread, on_delete=models.CASCADE, blank=True, null=True)
 
     def __str__(self):
-        return f"<Message pk={self.pk} sender_email=\"{self.sender_email}\" timestamp=\"{self.timestamp}\">"
+        return f'<Message pk={self.pk} sender_email="{self.sender_email}" timestamp="{self.timestamp}">'
 
     def is_older_than_a_day(self):
         """
@@ -95,20 +100,21 @@ class Message(models.Model):
         return difference.days >= 1
 
     class Meta:
-        ordering = ['-timestamp']
+        ordering = ["-timestamp"]
 
 
 def upload_to_location(_instance, _filename):
     """
     Generate the path in S3 to store the files
     """
-    return path.join('attachments', str(uuid4()))
+    return path.join("attachments", str(uuid4()))
 
 
 class Attachment(models.Model):
     """
     An attachment on an conversations email
     """
+
     # The corresponding email
     message = models.ForeignKey(Message, on_delete=models.CASCADE)
 
@@ -126,4 +132,4 @@ class Attachment(models.Model):
     content = models.FileField(upload_to=upload_to_location)
 
     def __str__(self):
-        return f"<Attachment name=\"{self.name}\" type=\"{self.content_type}\">"
+        return f'<Attachment name="{self.name}" type="{self.content_type}">'

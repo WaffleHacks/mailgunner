@@ -6,14 +6,14 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('conversations', '0011_auto_20210213_1058'),
+        ("conversations", "0011_auto_20210213_1058"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='thread',
-            name='subject',
-            field=models.CharField(default='', max_length=255),
+            model_name="thread",
+            name="subject",
+            field=models.CharField(default="", max_length=255),
             preserve_default=False,
         ),
     ]

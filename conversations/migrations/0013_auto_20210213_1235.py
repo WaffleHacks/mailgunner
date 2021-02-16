@@ -7,26 +7,26 @@ import django.utils.timezone
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('conversations', '0012_thread_subject'),
+        ("conversations", "0012_thread_subject"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='thread',
-            name='last_updated',
+            model_name="thread",
+            name="last_updated",
             field=models.DateTimeField(default=django.utils.timezone.now),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='thread',
-            name='originally_from',
-            field=models.CharField(default='', max_length=510),
+            model_name="thread",
+            name="originally_from",
+            field=models.CharField(default="", max_length=510),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='thread',
-            name='recipient',
-            field=models.EmailField(default='', max_length=254),
+            model_name="thread",
+            name="recipient",
+            field=models.EmailField(default="", max_length=254),
             preserve_default=False,
         ),
     ]

@@ -23,7 +23,7 @@ def create_thread(message: Message):
         last_updated=message.timestamp,
         originally_from=f"{message.from_name} <{message.from_email}>",
         recipient=message.recipient_email,
-        unread=True
+        unread=True,
     )
     thread.save()
 
@@ -81,20 +81,20 @@ def inbound_handler(event: AnymailInboundEvent, esp_name: str, **_unused):
         recipient_email=message.envelope_recipient,
         from_name=message.from_email.display_name,
         from_email=message.from_email.addr_spec,
-        to=', '.join(map(str, message.to)),
-        cc=', '.join(map(str, message.cc)),
+        to=", ".join(map(str, message.to)),
+        cc=", ".join(map(str, message.cc)),
         subject=message.subject,
         timestamp=event.timestamp,
         text=message.text,
         html=message.html if message.html is not None else f"<pre>{message.text}</pre>",
-        message_id=message['message-id'],
+        message_id=message["message-id"],
     )
 
     # Save message to database
     received.save()
 
     # Attempt to associate with existing thread
-    associate_with_thread(received, message['in-reply-to'])
+    associate_with_thread(received, message["in-reply-to"])
 
     # Extract the attachments (inline and direct)
     for attachment in chain(message.attachments, message.inline_attachments.values()):
@@ -115,7 +115,9 @@ def inbound_handler(event: AnymailInboundEvent, esp_name: str, **_unused):
 
 
 @receiver(post_send)
-def post_send_handler(message: EmailMessage, status: AnymailStatus, esp_name: str, **_unused):
+def post_send_handler(
+    message: EmailMessage, status: AnymailStatus, esp_name: str, **_unused
+):
     """
     Add sent messages to their corresponding thread
     """
@@ -132,12 +134,14 @@ def post_send_handler(message: EmailMessage, status: AnymailStatus, esp_name: st
         recipient_email=recipient_email,
         from_name=from_name,
         from_email=from_email,
-        to=', '.join(message.to),
-        cc=', '.join(message.cc),
+        to=", ".join(message.to),
+        cc=", ".join(message.cc),
         subject=message.subject,
         timestamp=timezone.now(),
         text=message.body,
-        html=message.body if ">" in message.body and "<" in message.body else f"<pre>{message.body}</pre>",
+        html=message.body
+        if ">" in message.body and "<" in message.body
+        else f"<pre>{message.body}</pre>",
         message_id=status.message_id,
     )
 
@@ -145,7 +149,11 @@ def post_send_handler(message: EmailMessage, status: AnymailStatus, esp_name: st
     sent.save()
 
     # Attempt to associate with existing thread
-    associate_with_thread(sent, message.extra_headers.get('in-reply-to') or message.extra_headers.get('In-Reply-To'))
+    associate_with_thread(
+        sent,
+        message.extra_headers.get("in-reply-to")
+        or message.extra_headers.get("In-Reply-To"),
+    )
 
     # Extract attachments
     for attachment in message.attachments:

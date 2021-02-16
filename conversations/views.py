@@ -15,18 +15,18 @@ class BaseThreadView(LoginRequiredMixin, ListView):
     model = Thread
 
     paginate_by = 25
-    context_object_name = 'threads'
+    context_object_name = "threads"
 
 
 class UnclaimedView(BaseThreadView):
-    template_name = 'conversations/index_unclaimed.html'
+    template_name = "conversations/index_unclaimed.html"
 
     def get_queryset(self):
         return self.model.objects.filter(assignee=None)
 
 
 class ClaimedView(BaseThreadView):
-    template_name = 'conversations/index_claimed.html'
+    template_name = "conversations/index_claimed.html"
 
     def get_queryset(self):
         return self.model.objects.filter(assignee=self.request.user)
@@ -34,9 +34,9 @@ class ClaimedView(BaseThreadView):
 
 class ThreadView(LoginRequiredMixin, DetailView):
     model = Thread
-    template_name = 'conversations/thread.html'
+    template_name = "conversations/thread.html"
 
-    context_object_name = 'thread'
+    context_object_name = "thread"
 
     def get_object(self, queryset=None):
         # Get the thread
@@ -44,8 +44,10 @@ class ThreadView(LoginRequiredMixin, DetailView):
 
         # Prevent users that didn't claim a thread from viewing it
         if thread.assignee != self.request.user and thread.assignee is not None:
-            messages.error(self.request, "This thread has been claimed by someone else!")
-            return redirect('conversations:unclaimed')
+            messages.error(
+                self.request, "This thread has been claimed by someone else!"
+            )
+            return redirect("conversations:unclaimed")
 
         # Mark it as read
         thread.unread = False
@@ -65,16 +67,16 @@ def claim(request, pk):
     if thread.assignee is not None:
         messages.error(
             request,
-            f"This thread is already claimed by {'you' if thread.assignee == request.user else 'someone'}"
+            f"This thread is already claimed by {'you' if thread.assignee == request.user else 'someone'}",
         )
-        return redirect('conversations:thread', pk=pk)
+        return redirect("conversations:thread", pk=pk)
 
     # Assign to the user
     thread.assignee = request.user
     thread.save()
 
     messages.success(request, "Successfully claimed this thread!")
-    return redirect('conversations:thread', pk=pk)
+    return redirect("conversations:thread", pk=pk)
 
 
 @login_required
@@ -87,19 +89,19 @@ def unclaim(request, pk):
     # Check that it is assigned
     if thread.assignee is None:
         messages.error(request, "This thread is already unclaimed!")
-        return redirect('conversations:thread', pk=pk)
+        return redirect("conversations:thread", pk=pk)
 
     # Check that it is assigned to the requester
     if thread.assignee != request.user:
         messages.error(request, "You cannot unclaim someone else's thread!")
-        return redirect('conversations:thread', pk=pk)
+        return redirect("conversations:thread", pk=pk)
 
     # Remove from the user
     thread.assignee = None
     thread.save()
 
     messages.success(request, "Successfully unclaimed this thread!")
-    return redirect('conversations:thread', pk=pk)
+    return redirect("conversations:thread", pk=pk)
 
 
 @login_required
@@ -113,7 +115,7 @@ def reply(request, pk):
     # Check that it is assigned to the requester
     if thread.assignee != request.user and thread.assignee is not None:
         messages.error(request, "You cannot reply to someone else's thread!")
-        return redirect('conversations:thread', pk=pk)
+        return redirect("conversations:thread", pk=pk)
 
     # Get the last message that was sent that wasn't from an @wafflehacks.tech email
     previous_messages = thread.message_set.all()
@@ -124,31 +126,41 @@ def reply(request, pk):
 
     # Render the template on initial request
     if request.method == "GET":
-        return render(request, 'conversations/reply.html', {
-            'thread': thread,
-            'last_message': last_message,
-            'new_message': False
-        })
+        return render(
+            request,
+            "conversations/reply.html",
+            {"thread": thread, "last_message": last_message, "new_message": False},
+        )
 
     # Get fields from request
-    from_name = request.POST.get('name')
-    from_email = request.POST.get('email')
-    subject = request.POST.get('subject')
-    body = request.POST.get('body')
+    from_name = request.POST.get("name")
+    from_email = request.POST.get("email")
+    subject = request.POST.get("subject")
+    body = request.POST.get("body")
 
     # Get all the previous message ids for the References header
-    message_ids = '\n'.join([msg.message_id for msg in previous_messages.reverse()])
+    message_ids = "\n".join([msg.message_id for msg in previous_messages.reverse()])
 
     # Queue the message for sending
-    is_successful = dispatch_message(request, from_name, from_email,
-                                     f"{last_message.from_name} <{last_message.from_email}>", subject, body,
-                                     last_message.message_id, message_ids)
+    is_successful = dispatch_message(
+        request,
+        from_name,
+        from_email,
+        f"{last_message.from_name} <{last_message.from_email}>",
+        subject,
+        body,
+        last_message.message_id,
+        message_ids,
+    )
     if not is_successful:
-        return redirect('conversations:reply', pk=thread.pk)
+        return redirect("conversations:reply", pk=thread.pk)
 
-    messages.success(request, "Successfully queued your reply for sending! "
-                              "It will be added below once it is successfully sent.")
-    return redirect('conversations:thread', pk=pk)
+    messages.success(
+        request,
+        "Successfully queued your reply for sending! "
+        "It will be added below once it is successfully sent.",
+    )
+    return redirect("conversations:thread", pk=pk)
 
 
 @login_required
@@ -162,12 +174,12 @@ def delete(request, pk):
     # Check that it is assigned to the requester
     if thread.assignee != request.user and thread.assignee is not None:
         messages.error(request, "You cannot delete someone else's thread!")
-        return redirect('conversations:thread', pk=pk)
+        return redirect("conversations:thread", pk=pk)
 
     # Delete the thread
     thread.delete()
 
-    return redirect('conversations:unclaimed')
+    return redirect("conversations:unclaimed")
 
 
 @login_required
@@ -179,24 +191,35 @@ def send(request):
         return render(request, "conversations/send.html", {"new_message": True})
 
     # Get fields from request
-    from_name = request.POST.get('name')
-    from_email = request.POST.get('email')
-    to = request.POST.get('to')
-    subject = request.POST.get('subject')
-    body = request.POST.get('body')
+    from_name = request.POST.get("name")
+    from_email = request.POST.get("email")
+    to = request.POST.get("to")
+    subject = request.POST.get("subject")
+    body = request.POST.get("body")
 
     # Queue the message for sending
     is_successful = dispatch_message(request, from_name, from_email, to, subject, body)
     if not is_successful:
-        return redirect('conversations:send')
+        return redirect("conversations:send")
 
-    messages.success(request, "Successfully queued your message for sending! "
-                              "It will be added below once it is successfully sent.")
-    return redirect('conversations:unclaimed')
+    messages.success(
+        request,
+        "Successfully queued your message for sending! "
+        "It will be added below once it is successfully sent.",
+    )
+    return redirect("conversations:unclaimed")
 
 
-def dispatch_message(request, from_name: str, from_email: str, to: str, subject: str, body: str,
-                     in_reply_to: str = None, references: str = None):
+def dispatch_message(
+    request,
+    from_name: str,
+    from_email: str,
+    to: str,
+    subject: str,
+    body: str,
+    in_reply_to: str = None,
+    references: str = None,
+):
     """
     Dispatch a message through MailGun
 
@@ -229,7 +252,10 @@ def dispatch_message(request, from_name: str, from_email: str, to: str, subject:
 
     # Ensure the from email is valid
     if "@" in from_email:
-        messages.error(request, f"Invalid username for the from email! Got {from_email}@wafflehacks.tech")
+        messages.error(
+            request,
+            f"Invalid username for the from email! Got {from_email}@wafflehacks.tech",
+        )
         return False
 
     # Build the message
@@ -242,9 +268,9 @@ def dispatch_message(request, from_name: str, from_email: str, to: str, subject:
 
     # Add reply headers
     if in_reply_to is not None and references is not None:
-        message.extra_headers['In-Reply-To'] = in_reply_to
+        message.extra_headers["In-Reply-To"] = in_reply_to
         # TODO: fix references header (waiting on MailGun support)
-        message.extra_headers['References'] = references
+        message.extra_headers["References"] = references
 
     # Get and add attachments
     for file in request.FILES.values():
@@ -252,7 +278,7 @@ def dispatch_message(request, from_name: str, from_email: str, to: str, subject:
         if isinstance(file, TemporaryUploadedFile):
             mime = magic.from_file(file.temporary_file_path(), mime=True)
             path = Path(file.temporary_file_path())
-            with path.open('rb') as f:
+            with path.open("rb") as f:
                 content = f.read()
         else:
             content = file.read()

@@ -6,25 +6,33 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('conversations', '0005_auto_20210212_1102'),
+        ("conversations", "0005_auto_20210212_1102"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='OutgoingMessage',
+            name="OutgoingMessage",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
             ],
         ),
         migrations.AddField(
-            model_name='receivedmessage',
-            name='message_id',
-            field=models.EmailField(default='', max_length=254),
+            model_name="receivedmessage",
+            name="message_id",
+            field=models.EmailField(default="", max_length=254),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='receivedmessage',
-            name='references',
+            model_name="receivedmessage",
+            name="references",
             field=models.EmailField(blank=True, max_length=254, null=True),
         ),
     ]

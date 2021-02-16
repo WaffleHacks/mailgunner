@@ -7,34 +7,49 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Attachment',
+            name="Attachment",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=255)),
-                ('content_type', models.CharField(max_length=129)),
-                ('inline', models.BooleanField()),
-                ('content', models.FileField(upload_to='')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=255)),
+                ("content_type", models.CharField(max_length=129)),
+                ("inline", models.BooleanField()),
+                ("content", models.FileField(upload_to="")),
             ],
         ),
         migrations.CreateModel(
-            name='ReceivedMessage',
+            name="ReceivedMessage",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('sender_email', models.EmailField(max_length=254)),
-                ('recipient_email', models.EmailField(max_length=254)),
-                ('from_name', models.CharField(max_length=255)),
-                ('from_email', models.EmailField(max_length=254)),
-                ('to', models.TextField()),
-                ('cc', models.TextField()),
-                ('subject', models.CharField(max_length=255)),
-                ('timestamp', models.DateTimeField()),
-                ('text', models.TextField()),
-                ('html', models.TextField()),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("sender_email", models.EmailField(max_length=254)),
+                ("recipient_email", models.EmailField(max_length=254)),
+                ("from_name", models.CharField(max_length=255)),
+                ("from_email", models.EmailField(max_length=254)),
+                ("to", models.TextField()),
+                ("cc", models.TextField()),
+                ("subject", models.CharField(max_length=255)),
+                ("timestamp", models.DateTimeField()),
+                ("text", models.TextField()),
+                ("html", models.TextField()),
             ],
         ),
     ]

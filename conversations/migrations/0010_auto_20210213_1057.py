@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('conversations', '0009_auto_20210213_1042'),
+        ("conversations", "0009_auto_20210213_1042"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='message',
-            name='type',
-            field=models.IntegerField(choices=[(0, 'Incoming'), (1, 'Outgoing')]),
+            model_name="message",
+            name="type",
+            field=models.IntegerField(choices=[(0, "Incoming"), (1, "Outgoing")]),
         ),
     ]

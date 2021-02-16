@@ -20,15 +20,12 @@ from . import views
 
 urlpatterns = [
     # Home page
-    path('', views.index, name='index'),
-
+    path("", views.index, name="index"),
     # user authentication
-    path('account/', include('account.urls')),
-
+    path("account/", include("account.urls")),
     # conversations mail
-    path('conversations/', include('conversations.urls')),
-
+    path("conversations/", include("conversations.urls")),
     # Routes from other packages
-    path('admin/', admin.site.urls),
-    re_path(r'^webhooks/', include('anymail.urls')),
+    path("admin/", admin.site.urls),
+    re_path(r"^webhooks/", include("anymail.urls")),
 ]

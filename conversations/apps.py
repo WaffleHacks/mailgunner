@@ -2,7 +2,7 @@ from django.apps import AppConfig
 
 
 class IncomingConfig(AppConfig):
-    name = 'conversations'
+    name = "conversations"
 
     def ready(self):
         """

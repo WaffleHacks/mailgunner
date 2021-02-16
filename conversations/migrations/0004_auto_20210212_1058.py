@@ -7,22 +7,22 @@ import conversations.models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('conversations', '0003_attachment_message'),
+        ("conversations", "0003_attachment_message"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='receivedmessage',
-            options={'ordering': ['-timestamp']},
+            name="receivedmessage",
+            options={"ordering": ["-timestamp"]},
         ),
         migrations.AlterField(
-            model_name='attachment',
-            name='content',
+            model_name="attachment",
+            name="content",
             field=models.FileField(upload_to=conversations.models.upload_to_location),
         ),
         migrations.AlterField(
-            model_name='receivedmessage',
-            name='cc',
+            model_name="receivedmessage",
+            name="cc",
             field=models.TextField(null=True),
         ),
     ]

@@ -8,41 +8,69 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('conversations', '0006_auto_20210213_0916'),
+        ("conversations", "0006_auto_20210213_0916"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Message',
+            name="Message",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('type', models.CharField(choices=[(conversations.models.MessageType['INCOMING'], 'conversations'), (conversations.models.MessageType['OUTGOING'], 'outgoing')], max_length=8)),
-                ('sender_email', models.EmailField(max_length=254)),
-                ('recipient_email', models.EmailField(max_length=254)),
-                ('from_name', models.CharField(max_length=255)),
-                ('from_email', models.EmailField(max_length=254)),
-                ('to', models.TextField()),
-                ('cc', models.TextField(blank=True)),
-                ('subject', models.CharField(max_length=255)),
-                ('timestamp', models.DateTimeField()),
-                ('text', models.TextField()),
-                ('html', models.TextField()),
-                ('message_id', models.EmailField(max_length=254)),
-                ('references', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='conversations.message')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "type",
+                    models.CharField(
+                        choices=[
+                            (
+                                conversations.models.MessageType["INCOMING"],
+                                "conversations",
+                            ),
+                            (conversations.models.MessageType["OUTGOING"], "outgoing"),
+                        ],
+                        max_length=8,
+                    ),
+                ),
+                ("sender_email", models.EmailField(max_length=254)),
+                ("recipient_email", models.EmailField(max_length=254)),
+                ("from_name", models.CharField(max_length=255)),
+                ("from_email", models.EmailField(max_length=254)),
+                ("to", models.TextField()),
+                ("cc", models.TextField(blank=True)),
+                ("subject", models.CharField(max_length=255)),
+                ("timestamp", models.DateTimeField()),
+                ("text", models.TextField()),
+                ("html", models.TextField()),
+                ("message_id", models.EmailField(max_length=254)),
+                (
+                    "references",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="conversations.message",
+                    ),
+                ),
             ],
             options={
-                'ordering': ['-timestamp'],
+                "ordering": ["-timestamp"],
             },
         ),
         migrations.DeleteModel(
-            name='OutgoingMessage',
+            name="OutgoingMessage",
         ),
         migrations.AlterField(
-            model_name='attachment',
-            name='message',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='conversations.message'),
+            model_name="attachment",
+            name="message",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="conversations.message"
+            ),
         ),
         migrations.DeleteModel(
-            name='ReceivedMessage',
+            name="ReceivedMessage",
         ),
     ]
