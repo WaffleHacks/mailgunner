@@ -45,9 +45,7 @@ class ThreadView(LoginRequiredMixin, DetailView):
 
         # Prevent users that didn't claim a thread from viewing it
         if thread.assignee != self.request.user and thread.assignee is not None:
-            messages.error(
-                self.request, "This thread has been claimed by someone else!"
-            )
+            messages.error(self.request, "This thread has been claimed by someone else!")
             return redirect("conversations:unclaimed")
 
         # Mark it as read
@@ -140,7 +138,7 @@ def reply(request, pk):
     body = request.POST.get("body")
 
     # Get all the previous message ids for the References header
-    message_ids = "\n".join([msg.message_id for msg in previous_messages.reverse()])
+    message_ids = "\r\n".join([msg.message_id for msg in previous_messages.reverse()])
 
     # Queue the message for sending
     is_successful = dispatch_message(
@@ -158,8 +156,7 @@ def reply(request, pk):
 
     messages.success(
         request,
-        "Successfully queued your reply for sending! "
-        "It will be added below once it is successfully sent.",
+        "Successfully queued your reply for sending! " "It will be added below once it is successfully sent.",
     )
     return redirect("conversations:thread", pk=pk)
 
@@ -205,8 +202,7 @@ def send(request):
 
     messages.success(
         request,
-        "Successfully queued your message for sending! "
-        "It will be added below once it is successfully sent.",
+        "Successfully queued your message for sending! " "It will be added below once it is successfully sent.",
     )
     return redirect("conversations:unclaimed")
 
@@ -285,7 +281,6 @@ def dispatch_message(
     # Add reply headers
     if in_reply_to is not None and references is not None:
         message.extra_headers["In-Reply-To"] = in_reply_to
-        # TODO: fix references header (waiting on MailGun support)
         message.extra_headers["References"] = references
 
     # Get and add attachments
