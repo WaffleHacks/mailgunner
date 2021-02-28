@@ -51,7 +51,7 @@ SECURE_HSTS_INCLUDE_SUBDOMAINS = HTTPS
 # Redirect HTTP to HTTPS
 SECURE_SSL_REDIRECT = HTTPS
 if HTTPS:
-  SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 
 # Application definition
@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     "whitenoise.runserver_nostatic",
     "account.apps.AuthenticationConfig",
     "conversations.apps.IncomingConfig",
+    "management.apps.ManagementConfig",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -197,3 +198,6 @@ admin_name = environ.get("ADMIN_NAME")
 admin_email = environ.get("ADMIN_EMAIL")
 if admin_name is not None and admin_email is not None:
     ADMINS.append((admin_name, admin_email))
+
+# Registration token to allow external registrations
+REGISTRATION_TOKEN = environ.get("REGISTRATION_TOKEN")

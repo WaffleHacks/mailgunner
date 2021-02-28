@@ -25,6 +25,8 @@ urlpatterns = [
     path("account/", include("account.urls")),
     # conversations mail
     path("conversations/", include("conversations.urls")),
+    # management api,
+    path("management/", include("management.urls")),
     # Routes from other packages
     path("admin/", admin.site.urls),
     re_path(r"^webhooks/", include("anymail.urls")),
