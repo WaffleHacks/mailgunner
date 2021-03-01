@@ -61,7 +61,7 @@ INSTALLED_APPS = [
     "whitenoise.runserver_nostatic",
     "account.apps.AuthenticationConfig",
     "conversations.apps.IncomingConfig",
-    "management.apps.ManagementConfig",
+    "external.apps.ExternalConfig",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
