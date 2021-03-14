@@ -26,7 +26,7 @@ Email with name:    Example Test &lt;example@test.com&gt;
     <br/>
     <div class="card w-100">
         <div class="card-body">
-            <form action="{% url 'conversations:send' %}" method="post" enctype="multipart/form-data">
+            <form action="{% url 'conversations:send' %}" method="post" enctype="multipart/form-data" id="message-form">
                 {% include 'conversations/message_form.html' %}
             </form>
         </div>

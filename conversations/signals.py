@@ -1,7 +1,7 @@
 from anymail.signals import AnymailInboundEvent, inbound, post_send
 from anymail.inbound import AnymailInboundMessage
 from anymail.message import AnymailStatus
-from django.core.mail import EmailMessage
+from django.core.mail import EmailMessage, EmailMultiAlternatives
 from django.core.files.uploadedfile import TemporaryUploadedFile
 from django.dispatch import receiver
 from django.utils import timezone
@@ -73,6 +73,8 @@ def inbound_handler(event: AnymailInboundEvent, esp_name: str, **_unused):
     """
     assert esp_name == "Mailgun"
 
+    # TODO: prevent reset emails from being stored
+
     # Extract data from the message
     message = event.message  # type: AnymailInboundMessage
     received = Message(
@@ -115,9 +117,7 @@ def inbound_handler(event: AnymailInboundEvent, esp_name: str, **_unused):
 
 
 @receiver(post_send)
-def post_send_handler(
-    message: EmailMessage, status: AnymailStatus, esp_name: str, **_unused
-):
+def post_send_handler(message: EmailMessage, status: AnymailStatus, esp_name: str, **_unused):
     """
     Add sent messages to their corresponding thread
     """
@@ -126,6 +126,18 @@ def post_send_handler(
     # Parse the emails
     [(from_name, from_email)] = getaddresses([message.from_email])
     [(_, recipient_email), *_] = getaddresses(message.to)
+
+    # Get the HTML message if it exists
+    html = None
+    if isinstance(message, EmailMultiAlternatives):
+        # Get the html content
+        for data, content_type in message.alternatives:
+            if content_type == "text/html":
+                html = data
+
+    # Set the html content if there's nothing
+    if html is None:
+        html = f"<pre>{message.body}</pre>"
 
     # Extract data from the message
     sent = Message(
@@ -139,9 +151,7 @@ def post_send_handler(
         subject=message.subject,
         timestamp=timezone.now(),
         text=message.body,
-        html=message.body
-        if ">" in message.body and "<" in message.body
-        else f"<pre>{message.body}</pre>",
+        html=html,
         message_id=status.message_id,
     )
 
@@ -151,8 +161,7 @@ def post_send_handler(
     # Attempt to associate with existing thread
     associate_with_thread(
         sent,
-        message.extra_headers.get("in-reply-to")
-        or message.extra_headers.get("In-Reply-To"),
+        message.extra_headers.get("in-reply-to") or message.extra_headers.get("In-Reply-To"),
     )
 
     # Extract attachments

@@ -1,6 +1,7 @@
 {% load static %}
 {% load conversations_extras %}
 
+<!-- JS for attachments -->
 <script src="{% static 'conversations/message-form.js' %}"></script>
 
 {% csrf_token %}
@@ -46,10 +47,7 @@
     {% endif %}
 </div>
 
-<div class="form-floating mb-3">
-    <textarea class="form-control" style="height: 16rem" id="body" name="body" placeholder="Enter your reply's content" required></textarea>
-    <label for="body">Message</label>
-</div>
+{% include 'conversations/summernote.html' %}
 
 <details>
     <summary>Attachments</summary>

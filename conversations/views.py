@@ -1,7 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.core.mail import EmailMessage
+from django.core.mail import EmailMultiAlternatives
 from django.core.files.uploadedfile import TemporaryUploadedFile
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic import DetailView, ListView
@@ -10,6 +10,13 @@ import magic
 from pathlib import Path
 
 from .models import Thread
+
+# Format for the HTML email
+HTML_EMAIL_FORMAT = (
+    '<!doctype html><head><meta name="viewport" content="width=device-width"/>'
+    '<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>'
+    "<title>{subject}</title></head><body>{html}</body></html>"
+)
 
 
 class BaseThreadView(LoginRequiredMixin, ListView):
@@ -135,7 +142,8 @@ def reply(request, pk):
     from_name = request.POST.get("name")
     from_email = request.POST.get("email")
     subject = request.POST.get("subject")
-    body = request.POST.get("body")
+    html = request.POST.get("body")
+    plaintext = request.POST.get("plaintext")
 
     # Get all the previous message ids for the References header
     message_ids = "\r\n".join([msg.message_id for msg in previous_messages.reverse()])
@@ -147,7 +155,8 @@ def reply(request, pk):
         from_email,
         f"{last_message.from_name} <{last_message.from_email}>",
         subject,
-        body,
+        html,
+        plaintext,
         last_message.message_id,
         message_ids,
     )
@@ -193,10 +202,11 @@ def send(request):
     from_email = request.POST.get("email")
     to = request.POST.get("to")
     subject = request.POST.get("subject")
-    body = request.POST.get("body")
+    html = request.POST.get("body")
+    plaintext = request.POST.get("plaintext")
 
     # Queue the message for sending
-    is_successful = dispatch_message(request, from_name, from_email, to, subject, body)
+    is_successful = dispatch_message(request, from_name, from_email, to, subject, html, plaintext)
     if not is_successful:
         return redirect("conversations:send")
 
@@ -224,7 +234,8 @@ def dispatch_message(
     from_email: str,
     to: str,
     subject: str,
-    body: str,
+    html: str,
+    plaintext: str,
     in_reply_to: str = None,
     references: str = None,
 ):
@@ -236,7 +247,8 @@ def dispatch_message(
     :param from_email: the address the mail is from
     :param to: who the mail is to
     :param subject: the subject of the message
-    :param body: the content of the message
+    :param html: the html content of the message
+    :param plaintext: the text only content of the message
     :param in_reply_to: what message the email is replying to
     :param references: other messages in the thread
     :return: whether the queuing was successful
@@ -254,7 +266,7 @@ def dispatch_message(
     if subject is None:
         messages.error(request, "There must be a subject for your reply")
         return False
-    if body is None:
+    if html is None or plaintext is None:
         messages.error(request, "Your reply must have some content")
         return False
 
@@ -271,12 +283,10 @@ def dispatch_message(
     formatted = list(map(format_address, addresses))
 
     # Build the message
-    message = EmailMessage(
-        subject=subject,
-        body=body,
-        to=formatted,
-        from_email=f"{from_name} <{from_email}@wafflehacks.tech>",
+    message = EmailMultiAlternatives(
+        subject=subject, body=plaintext, from_email=f"{from_name} <{from_email}@wafflehacks.tech>", to=formatted
     )
+    message.attach_alternative(HTML_EMAIL_FORMAT.format(subject=subject, html=html), "text/html")
 
     # Add reply headers
     if in_reply_to is not None and references is not None:
