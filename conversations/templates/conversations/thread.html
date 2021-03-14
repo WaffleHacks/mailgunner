@@ -18,6 +18,7 @@
     <div class="card w-100 h-100">
         <div class="card-body align-self-center mt-1">
             <a class="btn btn-primary" href="{% url 'conversations:reply' thread.pk %}">Reply</a>
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#change-category-modal">Change Category</button>
             {% if not thread.assignee %}
                 <a class="btn btn-success" href="{% url 'conversations:claim' thread.pk %}">Claim</a>
             {% else %}
@@ -90,11 +91,7 @@ Subject: {{ message.subject }}
     {% endfor %}
 
     <br/>
-    {% if thread.assignee == user %}
-        <a class="btn btn-outline-secondary" href="{% url 'conversations:claimed' %}">Back</a>
-    {% else %}
-        <a class="btn btn-outline-secondary" href="{% url 'conversations:unclaimed' %}">Back</a>
-    {% endif %}
+    <a class="btn btn-outline-secondary" href="{% if thread.category %}{% url 'conversations:category' thread.category.name|lower %}{% else %}{% url 'conversations:index' %}{% endif %}">Back</a>
 
     <div class="modal fade" id="delete-modal" tabindex="-1" aria-labelledby="delete-modal-label" aria-hidden="true">
         <div class="modal-dialog">
@@ -109,6 +106,34 @@ Subject: {{ message.subject }}
                 <div class="modal-footer">
                     <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Cancel</button>
                     <a class="btn btn-outline-danger" href="{% url 'conversations:delete' thread.pk %}">Confrim</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="change-category-modal" tabindex="-1" aria-labelledby="change-category-modal-label" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="change-category-modal-label">Change Category</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Change the current thread's category:</p>
+
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="category" id="category-uncategorized" value="" {% if thread.category.name is None %}checked{% endif %}/>
+                        <label class="form-check-label" for="category-uncategorized">Uncategorized</label>
+                    </div>
+                    {% for category in categories %}
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="category" id="category-{{ category.name|lower }}" value="{{ category.pk }}" {% if thread.category == category %}checked{% endif %}/>
+                            <label class="form-check-label" for="category-{{ category.name|lower }}">{{ category.name }}</label>
+                        </div>
+                    {% endfor %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-success" id="change-category-submit">Change</button>
                 </div>
             </div>
         </div>
@@ -133,6 +158,13 @@ Subject: {{ message.subject }}
 
             // Add it to the instance
             $(note).summernote("code", content);
-        })
+        });
+
+        // Submission handler for changing a thread's category
+        $("#change-category-submit").on("click", () => {
+            const checked = $('input[name="category"]:checked').val();
+            if (checked === "") window.location.href = "{% url 'conversations:change_category' thread.pk %}";
+            else window.location.href = "{% url 'conversations:change_category' thread.pk %}?category=" + checked;
+        });
     </script>
 {% endblock %}

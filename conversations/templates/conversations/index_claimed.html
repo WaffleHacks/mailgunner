@@ -1,9 +1,0 @@
-{% extends 'conversations/base_index.html' %}
-
-{% block header %}
-Below are all the threads you claimed that were sent/received.
-{% endblock %}
-
-{% block switcher %}
-<a class="btn btn-outline-primary" href="{% url 'conversations:unclaimed' %}">View Unclaimed</a>
-{% endblock %}

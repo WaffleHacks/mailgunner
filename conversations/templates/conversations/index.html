@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block title %}Conversations{% endblock %}
+
+{% block content %}
+    <div class="card w-100 mb-3">
+        <div class="card-body">
+            <div class="row text-center">
+                <div class="col-md">
+                    <a class="btn btn-outline-secondary" href="{% url 'index' %}">Home</a>
+                </div>
+                <div class="col-md">
+                    <a class="btn btn-outline-success" href="{% url 'conversations:send' %}">New Message</a>
+                </div>
+            </div>
+
+            <br/>
+
+            <p>
+                Below are all the threads, both claimed and unclaimed, in your inbox.
+                Open a thread by clicking on it, where you can then view and reply to it.
+                Use the tabs below to switch between categories.
+                To change a thread's category, open the thread and select the category from the dropdown at the top.
+            </p>
+        </div>
+    </div>
+
+    <div class="card w-100">
+        <div class="card-body">
+            <ul class="nav nav-tabs">
+                {% for c in categories %}
+                    <li class="nav-item">
+                        <a class="nav-link {% if c == category.name %}active{% endif %}" {% if c == category.name %}aria-current="page"{% endif %} href="{% if c == 'Uncategorized' %}{% url 'conversations:index' %}{% else %}{% url 'conversations:category' c|lower %}{% endif %}">{{ c }}</a>
+                    </li>
+                {% endfor %}
+            </ul>
+
+            <br/>
+
+            <div class="list-group">
+                {% for thread in threads %}
+                    <a href="{% url 'conversations:thread' thread.pk %}" class="list-group-item list-group-item-action" style="background-color: {% cycle 'white' '#e9e9e9' %}" aria-current="true">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">{{ thread.subject }}</h5>
+                            <small>
+                                {% if thread.is_older_than_a_day %}
+                                    {{ thread.last_updated|date }},
+                                {% endif %}
+                                {{ thread.last_updated|time:"f A" }}
+                                {% if thread.unread %}<span class="badge bg-success">Unread</span>{% endif %}
+                            </small>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 col-sm-12">
+                                <span class="badge bg-secondary">From</span>
+                                {{ thread.originally_from }}
+                            </div>
+                            <div class="col-md-6 col-sm-12">
+                                <span class="badge bg-primary">To</span>
+                                {{ thread.recipient }}
+                            </div>
+                        </div>
+                    </a>
+                {% empty %}
+                    <div class="card w-100">
+                        <div class="card-body">
+                            <p>Hooray! You have no messages, check back later!</p>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

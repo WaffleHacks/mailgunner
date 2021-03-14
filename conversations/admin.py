@@ -1,6 +1,7 @@
 from django.contrib import admin
+from django_better_admin_arrayfield.admin.mixins import DynamicArrayMixin
 
-from .models import Attachment, Message, Thread
+from .models import Attachment, Category, Message, Thread
 
 
 @admin.register(Attachment)
@@ -22,3 +23,8 @@ class ThreadAdmin(admin.ModelAdmin):
         "last_updated",
         "assignee",
     )
+
+
+@admin.register(Category)
+class CategoryAdmin(admin.ModelAdmin, DynamicArrayMixin):
+    list_display = ("name",)

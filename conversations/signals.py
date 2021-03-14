@@ -10,13 +10,19 @@ from itertools import chain
 import magic
 from pathlib import Path
 
-from .models import Message, MessageType, Thread
+from .models import Category, Message, MessageType, Thread
 
 
 def create_thread(message: Message):
     """
     Create a new thread for a message
     """
+    # Attempt to get a category for the thread
+    try:
+        category = Category.objects.get(addresses__contains=[message.from_email])
+    except Category.DoesNotExist:
+        category = None
+
     # Create and save the thread to the database
     thread = Thread(
         subject=message.subject,
@@ -24,6 +30,7 @@ def create_thread(message: Message):
         originally_from=f"{message.from_name} <{message.from_email}>",
         recipient=message.recipient_email,
         unread=True,
+        category=category,
     )
     thread.save()
 

@@ -3,13 +3,14 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.mail import EmailMultiAlternatives
 from django.core.files.uploadedfile import TemporaryUploadedFile
+from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
-from django.views.generic import DetailView, ListView
+from django.views.generic import DetailView
 from email.utils import getaddresses
 import magic
 from pathlib import Path
 
-from .models import Thread
+from .models import Category, Thread
 
 # Format for the HTML email
 HTML_EMAIL_FORMAT = (
@@ -19,25 +20,27 @@ HTML_EMAIL_FORMAT = (
 )
 
 
-class BaseThreadView(LoginRequiredMixin, ListView):
-    model = Thread
+@login_required
+def index(request, name: str = None):
+    """
+    Display the threads for a given category
+    """
+    # Get the names of all the categories
+    categories = Category.objects.values("name").all()
+    categories = ["Uncategorized"] + list(map(lambda c: c["name"], categories))
 
-    paginate_by = 25
-    context_object_name = "threads"
+    # Get the category and the threads in it
+    if name:
+        name = name.title()
+        category = Category.objects.filter(name=name).get()
+        threads = category.thread_set.filter(Q(assignee=request.user) | Q(assignee=None)).all()
+    else:
+        category = Category(name="Uncategorized", addresses=[])
+        threads = Thread.objects.filter(Q(assignee=request.user) | Q(assignee=None), category=None).all()
 
-
-class UnclaimedView(BaseThreadView):
-    template_name = "conversations/index_unclaimed.html"
-
-    def get_queryset(self):
-        return self.model.objects.filter(assignee=None)
-
-
-class ClaimedView(BaseThreadView):
-    template_name = "conversations/index_claimed.html"
-
-    def get_queryset(self):
-        return self.model.objects.filter(assignee=self.request.user)
+    return render(
+        request, "conversations/index.html", {"threads": threads, "category": category, "categories": categories}
+    )
 
 
 class ThreadView(LoginRequiredMixin, DetailView):
@@ -60,6 +63,11 @@ class ThreadView(LoginRequiredMixin, DetailView):
         thread.save()
 
         return thread
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["categories"] = Category.objects.all()
+        return context
 
 
 @login_required
@@ -107,6 +115,41 @@ def unclaim(request, pk):
     thread.save()
 
     messages.success(request, "Successfully unclaimed this thread!")
+    return redirect("conversations:thread", pk=pk)
+
+
+@login_required
+def change_category(request, pk):
+    """
+    Change the category of a thread
+    """
+    # Get the thread
+    thread = get_object_or_404(Thread, pk=pk)
+
+    # Check that it is assigned to the requester
+    if thread.assignee != request.user and thread.assignee is not None:
+        messages.error(request, "You cannot reply to someone else's thread!")
+        return redirect("conversations:thread", pk=pk)
+
+    # Get the category
+    category_id = request.GET.get("category")
+    if category_id is None:
+        category = None
+    else:
+        # Ensure the id is a number
+        try:
+            category_id = int(category_id)
+        except ValueError:
+            messages.error(request, "Cannot change to invalid category")
+            return redirect("conversations:thread", pk=pk)
+
+        # Find the category
+        category = get_object_or_404(Category, pk=category_id)
+
+    # Set the new category
+    thread.category = category
+    thread.save()
+
     return redirect("conversations:thread", pk=pk)
 
 

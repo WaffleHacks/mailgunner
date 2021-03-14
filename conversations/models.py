@@ -1,8 +1,24 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils import timezone
+from django_better_admin_arrayfield.models.fields import ArrayField
 from os import path
 from uuid import uuid4
+
+
+class Category(models.Model):
+    """
+    A collection of threads linked by recipient email
+    """
+
+    # The name of the category
+    name = models.CharField(max_length=256)
+
+    # The address corresponding to the field
+    addresses = ArrayField(models.EmailField(), blank=True)
+
+    def __str__(self):
+        return self.name
 
 
 class Thread(models.Model):
@@ -11,9 +27,10 @@ class Thread(models.Model):
     """
 
     # Who the thread is assigned to
-    assignee = models.ForeignKey(
-        get_user_model(), on_delete=models.CASCADE, blank=True, null=True
-    )
+    assignee = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, blank=True, null=True)
+
+    # The category the message is in
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, blank=True, null=True)
 
     # The subject line of the original message
     subject = models.CharField(max_length=255)
