@@ -56,7 +56,7 @@ class ThreadView(LoginRequiredMixin, DetailView):
         # Prevent users that didn't claim a thread from viewing it
         if thread.assignee != self.request.user and thread.assignee is not None:
             messages.error(self.request, "This thread has been claimed by someone else!")
-            return redirect("conversations:unclaimed")
+            return redirect("conversations:index")
 
         # Mark it as read
         thread.unread = False
@@ -229,7 +229,7 @@ def delete(request, pk):
     # Delete the thread
     thread.delete()
 
-    return redirect("conversations:unclaimed")
+    return redirect("conversations:index")
 
 
 @login_required
@@ -257,7 +257,7 @@ def send(request):
         request,
         "Successfully queued your message for sending! " "It will be added below once it is successfully sent.",
     )
-    return redirect("conversations:unclaimed")
+    return redirect("conversations:index")
 
 
 def format_address(parts):
