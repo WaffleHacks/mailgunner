@@ -1,3 +1,4 @@
+from anymail.exceptions import AnymailInvalidAddress, AnymailRecipientsRefused, AnymailAPIError
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -352,6 +353,23 @@ def dispatch_message(
         message.attach(file.name, content, mime)
 
     # Queue the message for sending
-    message.send()
+    try:
+        sent = message.send()
+    except AnymailAPIError:
+        messages.error(request, "An error occurred while sending your message. Please try again later.")
+        return False
+    except AnymailInvalidAddress:
+        messages.error(request, "Failed to parse emails to send to. Please check they are correct and try again.")
+        return False
+    except AnymailRecipientsRefused:
+        messages.error(
+            request, "One or more of the recipients rejected the message. Please check they are correct and try again."
+        )
+        return False
+
+    # Ensure the message was sent
+    if sent == 0:
+        messages.error(request, "An error occurred while sending your message, please try again.")
+        return False
 
     return True
