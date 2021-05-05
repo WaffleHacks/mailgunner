@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block title %}Schedule Mail{% endblock %}
+
+{% block content %}
+    <div class="card w-100 mb-3">
+        <div class="card-body">
+            <div class="row text-center">
+                <div class="col-md">
+                    <a class="btn btn-outline-secondary" href="{% url 'index' %}">Home</a>
+                </div>
+                <div class="col-md">
+                    <a class="btn btn-outline-success" href="{% url 'schedule:new' %}">Schedule Message</a>
+                </div>
+            </div>
+
+            <br/>
+
+            <p>
+                Below are all the messages that {{ view.description }}.
+                Use the tabs below to switch between sent and queued messages.
+                You can edit a message up until the time it is scheduled to be sent.
+            </p>
+        </div>
+    </div>
+
+    <div class="card w-100">
+        <div class="card-body">
+            <ul class="nav nav-tabs">
+                <li class="nav-item">
+                    <a class="nav-link {% if view.current_tab == "queued" %}active{% endif %}" {% if view.current_tab == "queued" %}aria-current="page"{% endif %} href="{% url 'schedule:queued' %}">Queued</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if view.current_tab == "sent" %}active{% endif %}" {% if view.current_tab == "sent" %}aria-current="page"{% endif %} href="{% url 'schedule:sent' %}">Sent</a>
+                </li>
+            </ul>
+
+            <br/>
+
+            <div class="list-group">
+                {% for message in scheduled %}
+                    <a href="{% url 'schedule:message' message.pk %}" class="list-group-item list-group-item-action" style="background-color: {% cycle 'white' '#e9e9e9' %}" aria-current="true">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">{{ message.subject }}</h5>
+                            <small>
+                                <span class="badge {% if view.current_tab == 'queued' %}bg-secondary{% else %}bg-success{% endif %}">{{ view.current_tab|capfirst }}</span>
+                                {{ message.send_at|date }}
+                                {{ message.send_at|time:"f A" }}
+                            </small>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 col-sm-12">
+                                <span class="badge bg-secondary">From</span>
+                                {{ message.from_name }} &lt;{{ message.from_email }}&gt;
+                            </div>
+                            <div class="col-md-6 col-sm-12">
+                                <span class="badge bg-primary">To</span>
+                                {{ message.to }}
+                            </div>
+                        </div>
+                    </a>
+                {% empty %}
+                    <div class="card w-100">
+                        <div class="card-body">
+                            <p>No {{ view.current_tab }} messages yet...</p>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

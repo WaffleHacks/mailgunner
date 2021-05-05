@@ -1,0 +1,19 @@
+{% extends "messages/message_form.html" %}
+{% load static %}
+
+{% block extra_resources %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.9/flatpickr.min.css" integrity="sha512-OtwMKauYE8gmoXusoKzA/wzQoh7WThXJcJVkA29fHP58hBF7osfY0WLCIZbwkeL9OgRCxtAfy17Pn3mndQ4PZQ==" crossorigin="anonymous" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.9/flatpickr.min.js" integrity="sha512-+ruHlyki4CepPr07VklkX/KM5NXdD16K1xVwSva5VqOVbsotyCQVKEwdQ1tAeo3UkHCXfSMtKU/mZpKjYqkxZA==" crossorigin="anonymous"></script>
+
+    <script src="{% static 'schedule/flatpickr.js' %}"></script>
+{% endblock %}
+
+{% block extra_fields %}
+    <div class="row g-2 mb-3">
+        <div class="w-50">
+            <label for="datetime-picker" class="mb-1">Send At</label>
+            <input type="text" id="datetime-picker" name="send_at" placeholder="Select date and time..." required="required"/>
+            <small class="text-muted"><b>NOTE:</b> Time is in PST</small>
+        </div>
+    </div>
+{% endblock %}

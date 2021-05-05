@@ -14,7 +14,7 @@
                     <a class="nav-link" href="{% url 'conversations:index' %}">Conversations</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Schedule</a>
+                    <a class="nav-link" href="{% url 'schedule:queued' %}">Schedule</a>
                 </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navDropdownToggle" data-bs-toggle="dropdown" aria-expanded="false">{{ user.get_username }}</a>

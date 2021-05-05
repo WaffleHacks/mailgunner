@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+.{% extends 'base.html' %}
 
 {% block title %}New Message{% endblock %}
 
@@ -27,7 +27,7 @@ Email with name:    Example Test &lt;example@test.com&gt;
     <div class="card w-100">
         <div class="card-body">
             <form action="{% url 'conversations:send' %}" method="post" enctype="multipart/form-data" id="message-form">
-                {% include 'conversations/message_form.html' %}
+                {% include 'messages/message_form.html' %}
             </form>
         </div>
     </div>

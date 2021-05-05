@@ -27,6 +27,8 @@ urlpatterns = [
     path("conversations/", include("conversations.urls")),
     # external api,
     path("external/", include("external.urls")),
+    # schedule mail
+    path("schedule/", include("schedule.urls")),
     # Routes from other packages
     path("admin/", admin.site.urls),
     re_path(r"^webhooks/", include("anymail.urls")),

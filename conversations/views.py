@@ -1,16 +1,11 @@
-from anymail.exceptions import AnymailInvalidAddress, AnymailRecipientsRefused, AnymailAPIError
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.core.mail import EmailMultiAlternatives
-from django.core.files.uploadedfile import TemporaryUploadedFile
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic import DetailView
-from email.utils import getaddresses
-import magic
-from pathlib import Path
 
+from utils import mail
 from .models import Category, Thread
 
 # Format for the HTML email
@@ -34,13 +29,19 @@ def index(request, name: str = None):
     if name:
         name = name.title()
         category = Category.objects.filter(name=name).get()
-        threads = category.thread_set.filter(Q(assignee=request.user) | Q(assignee=None)).all()
+        threads = category.thread_set.filter(
+            Q(assignee=request.user) | Q(assignee=None)
+        ).all()
     else:
         category = Category(name="Uncategorized", addresses=[])
-        threads = Thread.objects.filter(Q(assignee=request.user) | Q(assignee=None), category=None).all()
+        threads = Thread.objects.filter(
+            Q(assignee=request.user) | Q(assignee=None), category=None
+        ).all()
 
     return render(
-        request, "conversations/index.html", {"threads": threads, "category": category, "categories": categories}
+        request,
+        "conversations/index.html",
+        {"threads": threads, "category": category, "categories": categories},
     )
 
 
@@ -56,7 +57,9 @@ class ThreadView(LoginRequiredMixin, DetailView):
 
         # Prevent users that didn't claim a thread from viewing it
         if thread.assignee != self.request.user and thread.assignee is not None:
-            messages.error(self.request, "This thread has been claimed by someone else!")
+            messages.error(
+                self.request, "This thread has been claimed by someone else!"
+            )
             return redirect("conversations:index")
 
         # Mark it as read
@@ -192,8 +195,8 @@ def reply(request, pk):
     # Get all the previous message ids for the References header
     message_ids = "\r\n".join([msg.message_id for msg in previous_messages.reverse()])
 
-    # Queue the message for sending
-    is_successful = dispatch_message(
+    # Queue the message for messages
+    is_successful = mail.dispatch_message(
         request,
         from_name,
         from_email,
@@ -209,7 +212,8 @@ def reply(request, pk):
 
     messages.success(
         request,
-        "Successfully queued your reply for sending! " "It will be added below once it is successfully sent.",
+        "Successfully queued your reply for messages! "
+        "It will be added below once it is successfully sent.",
     )
     return redirect("conversations:thread", pk=pk)
 
@@ -250,126 +254,15 @@ def send(request):
     plaintext = request.POST.get("plaintext")
 
     # Queue the message for sending
-    is_successful = dispatch_message(request, from_name, from_email, to, subject, html, plaintext)
+    is_successful = mail.dispatch_message(
+        request, from_name, from_email, to, subject, html, plaintext
+    )
     if not is_successful:
         return redirect("conversations:send")
 
     messages.success(
         request,
-        "Successfully queued your message for sending! " "It will be added below once it is successfully sent.",
+        "Successfully queued your message for sending! "
+        "It will be added below once it is successfully sent.",
     )
     return redirect("conversations:index")
-
-
-def format_address(parts):
-    """
-    Format a parsed email address for sending
-    :param parts: a tuple of the name and email
-    :return: a properly formatted email
-    """
-    if parts[0] == "":
-        return parts[1]
-    return f"{parts[0]} <{parts[1]}>"
-
-
-def dispatch_message(
-    request,
-    from_name: str,
-    from_email: str,
-    to: str,
-    subject: str,
-    html: str,
-    plaintext: str,
-    in_reply_to: str = None,
-    references: str = None,
-):
-    """
-    Dispatch a message through MailGun
-
-    :param request: the Django request
-    :param from_name: who the mail is from
-    :param from_email: the address the mail is from
-    :param to: who the mail is to
-    :param subject: the subject of the message
-    :param html: the html content of the message
-    :param plaintext: the text only content of the message
-    :param in_reply_to: what message the email is replying to
-    :param references: other messages in the thread
-    :return: whether the queuing was successful
-    """
-    # Ensure that all fields are present
-    if from_name is None:
-        messages.error(request, "The from name cannot be blank")
-        return False
-    if from_email is None:
-        messages.error(request, "The from email cannot be blank")
-        return False
-    if to is None:
-        messages.error(request, "The to email cannot be blank")
-        return False
-    if subject is None:
-        messages.error(request, "There must be a subject for your reply")
-        return False
-    if html is None or plaintext is None:
-        messages.error(request, "Your reply must have some content")
-        return False
-
-    # Ensure the from email is valid
-    if "@" in from_email:
-        messages.error(
-            request,
-            f"Invalid username for the from email! Got {from_email}@wafflehacks.tech",
-        )
-        return False
-
-    # Parse the To email(s)
-    addresses = getaddresses(to.split(","))
-    formatted = list(map(format_address, addresses))
-
-    # Build the message
-    message = EmailMultiAlternatives(
-        subject=subject, body=plaintext, from_email=f"{from_name} <{from_email}@wafflehacks.tech>", to=formatted
-    )
-    message.attach_alternative(HTML_EMAIL_FORMAT.format(subject=subject, html=html), "text/html")
-
-    # Add reply headers
-    if in_reply_to is not None and references is not None:
-        message.extra_headers["In-Reply-To"] = in_reply_to
-        message.extra_headers["References"] = references
-
-    # Get and add attachments
-    for file in request.FILES.values():
-        # Determine the MIME type of the uploaded file and read the content
-        if isinstance(file, TemporaryUploadedFile):
-            mime = magic.from_file(file.temporary_file_path(), mime=True)
-            path = Path(file.temporary_file_path())
-            with path.open("rb") as f:
-                content = f.read()
-        else:
-            content = file.read()
-            mime = magic.from_buffer(content, mime=True)
-
-        # Attach the file to the message
-        message.attach(file.name, content, mime)
-
-    # Queue the message for sending
-    try:
-        sent = message.send()
-    except AnymailAPIError:
-        messages.error(request, "An error occurred while sending your message. Please try again later.")
-        return False
-    except AnymailInvalidAddress:
-        messages.error(request, "Failed to parse emails to send to. Please check they are correct and try again.")
-        return False
-    except AnymailRecipientsRefused:
-        messages.error(
-            request, "One or more of the recipients rejected the message. Please check they are correct and try again."
-        )
-        return False
-
-    # Ensure the message was sent
-    if sent == 0:
-        messages.error(request, "An error occurred while sending your message, please try again.")
-        return False
-
-    return True

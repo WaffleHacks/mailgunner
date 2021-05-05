@@ -62,6 +62,7 @@ INSTALLED_APPS = [
     "account.apps.AuthenticationConfig",
     "conversations.apps.IncomingConfig",
     "external.apps.ExternalConfig",
+    "schedule.apps.ScheduleConfig",
     "django_better_admin_arrayfield",
     "django.contrib.admin",
     "django.contrib.auth",

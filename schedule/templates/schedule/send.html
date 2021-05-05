@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Schedule Message{% endblock %}
+
+{% block content %}
+    <div class="card w-100">
+        <div class="card-body">
+            <h4 class="card-title">New Scheduled Message:</h4>
+            <p class="card-text">
+                Type your message, the subject, and who it is to in the text boxes below.
+                You can use all the features of the text editor, but keep in mind that not all email apps will display it the same way.
+                For convenience, your email and name are filled in by default, but you can change them to anything you'd like.
+            </p>
+            <p class="card-text">
+                In the <code>To</code> field, you can either enter just the email or a name and the corresponding email.
+                You can send emails to multiple recipients by separating each address with a comma.
+                <pre>
+    Email only:         example@test.com
+    Email with name:    Example Test &lt;example@test.com&gt;
+                </pre>
+            </p>
+        </div>
+    </div>
+
+    <br/>
+    <div class="card w-100">
+        <div class="card-body">
+            <form action="{% url 'schedule:new' %}" method="post" enctype="multipart/form-data" id="message-form">
+                {% include "schedule/message_form.html" %}
+            </form>
+        </div>
+    </div>
+{% endblock %}

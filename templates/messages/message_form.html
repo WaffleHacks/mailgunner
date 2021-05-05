@@ -2,7 +2,8 @@
 {% load conversations_extras %}
 
 <!-- JS for attachments -->
-<script src="{% static 'conversations/message-form.js' %}"></script>
+<script src="{% static 'messages/message-form.js' %}"></script>
+{% block extra_resources %}{% endblock %}
 
 {% csrf_token %}
 
@@ -47,7 +48,9 @@
     {% endif %}
 </div>
 
-{% include 'conversations/summernote.html' %}
+{% block extra_fields %}{% endblock %}
+
+{% include 'messages/summernote.html' %}
 
 <details>
     <summary>Attachments</summary>
