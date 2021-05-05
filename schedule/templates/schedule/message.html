@@ -55,7 +55,7 @@
             <div id="summernote-{{ message.id }}" class="summernote"></div>
             <script type="text/plain" id="summernote-content-{{ message.id }}">{{ message.html|safe }}</script>
         </div>
-        {% with attachments=message.scheduledattachment_set.all %}
+        {% with attachments=message.attachment_set.all %}
             {% if attachments|length != 0 %}
                 <div class="card-footer">
                     <ul class="list-group list-group-flush">

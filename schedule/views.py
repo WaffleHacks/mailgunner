@@ -10,13 +10,13 @@ from email.utils import getaddresses
 from pathlib import Path
 
 from utils import mail
-from .models import ScheduledMessage
+from .models import Message
 
 DATETIME_FORMAT = "%Y-%m-%d %H:%M"
 
 
 class BaseIndexView(LoginRequiredMixin, ListView):
-    model = ScheduledMessage
+    model = Message
     template_name = "schedule/index.html"
 
     context_object_name = "scheduled"
@@ -27,7 +27,7 @@ class QueuedView(BaseIndexView):
     description = "are queued to be sent"
 
     def get_queryset(self):
-        return ScheduledMessage.objects.filter(send_at__gte=timezone.now())
+        return Message.objects.filter(send_at__gte=timezone.now())
 
 
 class SentView(BaseIndexView):
@@ -35,9 +35,7 @@ class SentView(BaseIndexView):
     description = "have been sent"
 
     def get_queryset(self):
-        return ScheduledMessage.objects.order_by("-send_at").filter(
-            send_at__lte=timezone.now()
-        )
+        return Message.objects.order_by("-send_at").filter(send_at__lte=timezone.now())
 
 
 @login_required
@@ -75,7 +73,7 @@ def new(request):
 
     # Save the scheduled message to the database
     [(parsed_from_name, parsed_from_email)] = getaddresses([mime_message.from_email])
-    message = ScheduledMessage(
+    message = Message(
         from_name=parsed_from_name,
         from_email=parsed_from_email,
         to=to,
@@ -101,7 +99,7 @@ def new(request):
         else:
             temp.write(content)
 
-        message.scheduledattachment_set.create(
+        message.attachment_set.create(
             name=sanitized_path, content_type=mime, inline=False, content=temp
         )
 
@@ -111,7 +109,7 @@ def new(request):
 
 
 class MessageView(LoginRequiredMixin, DetailView):
-    model = ScheduledMessage
+    model = Message
     template_name = "schedule/message.html"
 
     context_object_name = "message"
@@ -123,7 +121,7 @@ def delete(request, pk):
     Delete the specified message
     """
     # Get the message
-    message = get_object_or_404(ScheduledMessage, pk=pk)
+    message = get_object_or_404(Message, pk=pk)
 
     # Delete it
     message.delete()

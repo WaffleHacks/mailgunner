@@ -4,7 +4,7 @@ from os import path
 from uuid import uuid4
 
 
-class ScheduledMessage(models.Model):
+class Message(models.Model):
     """
     A message that is scheduled to be sent at sometime in the future
     """
@@ -46,13 +46,13 @@ def upload_to_location(_instance, _filename):
     return path.join("schedule", str(uuid4()))
 
 
-class ScheduledAttachment(models.Model):
+class Attachment(models.Model):
     """
     An attachment on a message
     """
 
     # The corresponding message
-    message = models.ForeignKey(ScheduledMessage, on_delete=models.CASCADE)
+    message = models.ForeignKey(Message, on_delete=models.CASCADE)
 
     # The name of the file
     name = models.CharField(max_length=255)
