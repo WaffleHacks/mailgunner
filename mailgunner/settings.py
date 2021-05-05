@@ -114,6 +114,7 @@ DATABASES = {
         "PORT": "5432",
     }
 }
+DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
 # Load database config from environment
 db_from_env = dj_database_url.config("DATABASE_URL", conn_max_age=600)
