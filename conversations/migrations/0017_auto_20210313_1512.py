@@ -7,13 +7,15 @@ import django_better_admin_arrayfield.models.fields
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('conversations', '0016_auto_20210313_1503'),
+        ("conversations", "0016_auto_20210313_1503"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='category',
-            name='addresses',
-            field=django_better_admin_arrayfield.models.fields.ArrayField(base_field=models.EmailField(max_length=254), blank=True, size=None),
+            model_name="category",
+            name="addresses",
+            field=django_better_admin_arrayfield.models.fields.ArrayField(
+                base_field=models.EmailField(max_length=254), blank=True, size=None
+            ),
         ),
     ]

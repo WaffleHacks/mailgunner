@@ -26,8 +26,16 @@ def register(request):
     password = request.POST.get("password")
 
     # Ensure everything is present
-    if first_name is None or last_name is None or username is None or email is None or password is None:
-        return error("missing at least one of: 'first-name', 'last-name', 'username', 'email', and 'password'")
+    if (
+        first_name is None
+        or last_name is None
+        or username is None
+        or email is None
+        or password is None
+    ):
+        return error(
+            "missing at least one of: 'first-name', 'last-name', 'username', 'email', and 'password'"
+        )
 
     # Check that the username is not already taken
     if len(User.objects.filter(username=username)) != 0:
@@ -36,7 +44,9 @@ def register(request):
         return error("email already in use")
 
     # Create the base user
-    user = User(username=username, first_name=first_name, last_name=last_name, email=email)
+    user = User(
+        username=username, first_name=first_name, last_name=last_name, email=email
+    )
 
     # Validate the email and password
     try:

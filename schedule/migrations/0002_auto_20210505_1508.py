@@ -6,20 +6,20 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('schedule', '0001_initial'),
+        ("schedule", "0001_initial"),
     ]
 
     operations = [
         migrations.RenameModel(
-            old_name='ScheduledAttachment',
-            new_name='Attachment',
+            old_name="ScheduledAttachment",
+            new_name="Attachment",
         ),
         migrations.RenameModel(
-            old_name='ScheduledMessage',
-            new_name='Message',
+            old_name="ScheduledMessage",
+            new_name="Message",
         ),
         migrations.AlterModelOptions(
-            name='message',
-            options={'ordering': ['send_at']},
+            name="message",
+            options={"ordering": ["send_at"]},
         ),
     ]

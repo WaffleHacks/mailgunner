@@ -11,6 +11,10 @@ urlpatterns = [
     path("threads/<int:pk>/reply", views.reply, name="reply"),
     path("threads/<int:pk>/assign", views.claim, name="claim"),
     path("threads/<int:pk>/unassign", views.unclaim, name="unclaim"),
-    path("threads/<int:pk>/change-category", views.change_category, name="change_category"),
+    path(
+        "threads/<int:pk>/change-category",
+        views.change_category,
+        name="change_category",
+    ),
     path("threads/<int:pk>/delete", views.delete, name="delete"),
 ]
