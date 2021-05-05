@@ -4,11 +4,13 @@ from anymail.exceptions import (
     AnymailRecipientsRefused,
 )
 from django.contrib import messages
+from django.core.files import File
 from django.core.files.uploadedfile import TemporaryUploadedFile
 from django.core.mail import EmailMultiAlternatives
 from email.utils import getaddresses
 import magic
 from pathlib import Path
+from typing import Iterator
 
 HTML_EMAIL_FORMAT = (
     '<!doctype html><head><meta name="viewport" content="width=device-width"/>'
@@ -77,7 +79,7 @@ def validate_fields(
 
 
 def build_message(
-    request,
+    attachments: Iterator[File],
     from_name: str,
     from_email: str,
     to: str,
@@ -90,7 +92,7 @@ def build_message(
     """
     Create the multi-part message to be sent
 
-    :param request: the Django request
+    :param attachments: the attachments to add
     :param from_name: who the mail is from
     :param from_email: the address the mail is from
     :param to: who the mail is to
@@ -109,7 +111,7 @@ def build_message(
     message = EmailMultiAlternatives(
         subject=subject,
         body=plaintext,
-        from_email=f"{from_name} <{from_email}@wafflehacks.tech>",
+        from_email=f"{from_name} <{from_email}>",
         to=formatted,
     )
     message.attach_alternative(
@@ -122,7 +124,7 @@ def build_message(
         message.extra_headers["References"] = references
 
     # Get and add attachments
-    for file in request.FILES.values():
+    for file in attachments:
         # Determine the MIME type of the uploaded file and read the content
         if isinstance(file, TemporaryUploadedFile):
             mime = magic.from_file(file.temporary_file_path(), mime=True)
@@ -171,9 +173,9 @@ def dispatch_message(
 
     # Build the message
     message = build_message(
-        request,
+        request.FILES.values(),
         from_name,
-        from_email,
+        from_email + "@wafflehacks.tech",
         to,
         subject,
         html,

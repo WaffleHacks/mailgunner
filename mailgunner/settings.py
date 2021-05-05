@@ -204,3 +204,11 @@ if admin_name is not None and admin_email is not None:
 
 # Registration token to allow external registrations
 REGISTRATION_TOKEN = environ.get("REGISTRATION_TOKEN")
+
+# Celery configuration
+CELERY_BROKER_URL = environ.get("CELERY_BROKER_URL")
+CELERY_RESULT_BACKEND = environ.get("CELERY_RESULT_BACKEND")
+CELERY_TIMEZONE = TIME_ZONE
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_ACCEPT_CONTENT = ["json"]

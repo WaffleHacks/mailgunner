@@ -11,6 +11,7 @@ from pathlib import Path
 
 from utils import mail
 from .models import Message
+from .tasks import queue_message
 
 DATETIME_FORMAT = "%Y-%m-%d %H:%M"
 
@@ -68,8 +69,9 @@ def new(request):
         request, from_name, from_email, to, subject, html, plaintext
     )
 
-    # Parse the date to send it at as a datetime object
+    # Parse the timestamp and make it timezone aware
     parsed_send_at = datetime.strptime(send_at, DATETIME_FORMAT)
+    parsed_send_at = timezone.make_aware(parsed_send_at)
 
     # Save the scheduled message to the database
     [(parsed_from_name, parsed_from_email)] = getaddresses([mime_message.from_email])
@@ -103,7 +105,8 @@ def new(request):
             name=sanitized_path, content_type=mime, inline=False, content=temp
         )
 
-    # TODO: queue the message for sending (probably needs celery)
+    # Queue the message for sending later
+    queue_message.apply_async((message.id,), eta=message.send_at)
 
     return redirect("schedule:queued")
 
