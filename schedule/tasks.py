@@ -28,7 +28,7 @@ def queue_message(message_id):
     email = mail.build_message(
         attachments,
         message.from_name,
-        message.from_email,
+        message.from_email + "@wafflehacks.tech",
         message.to,
         message.subject,
         message.html,
