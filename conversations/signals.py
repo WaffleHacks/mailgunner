@@ -1,4 +1,10 @@
-from anymail.signals import AnymailInboundEvent, inbound, post_send
+from anymail.signals import (
+    AnymailInboundEvent,
+    AnymailTrackingEvent,
+    inbound,
+    post_send,
+    tracking,
+)
 from anymail.inbound import AnymailInboundMessage
 from anymail.message import AnymailStatus
 from django.core.mail import EmailMessage, EmailMultiAlternatives
@@ -10,7 +16,7 @@ from itertools import chain
 import magic
 from pathlib import Path
 
-from .models import Category, Message, MessageType, Thread
+from .models import Category, Message, MessageStatus, MessageType, Thread
 
 
 def create_thread(message: Message):
@@ -124,7 +130,9 @@ def inbound_handler(event: AnymailInboundEvent, esp_name: str, **_unused):
 
 
 @receiver(post_send)
-def post_send_handler(message: EmailMessage, status: AnymailStatus, esp_name: str, **_unused):
+def post_send_handler(
+    message: EmailMessage, status: AnymailStatus, esp_name: str, **_unused
+):
     """
     Add sent messages to their corresponding thread
     """
@@ -160,6 +168,7 @@ def post_send_handler(message: EmailMessage, status: AnymailStatus, esp_name: st
         text=message.body,
         html=html,
         message_id=status.message_id,
+        status=MessageStatus.PENDING,
     )
 
     # Save message to database
@@ -168,7 +177,8 @@ def post_send_handler(message: EmailMessage, status: AnymailStatus, esp_name: st
     # Attempt to associate with existing thread
     associate_with_thread(
         sent,
-        message.extra_headers.get("in-reply-to") or message.extra_headers.get("In-Reply-To"),
+        message.extra_headers.get("in-reply-to")
+        or message.extra_headers.get("In-Reply-To"),
     )
 
     # Extract attachments
@@ -194,3 +204,26 @@ def post_send_handler(message: EmailMessage, status: AnymailStatus, esp_name: st
             inline=False,
             content=temp,
         )
+
+
+@receiver(tracking)
+def tracking_handler(event: AnymailTrackingEvent, esp_name: str, **_unused):
+    """
+    Update the current status of the message in the database
+    """
+    assert esp_name == "Mailgun"
+
+    # Ensure the event is handleable
+    if event.event_type not in ["delivered", "rejected", "bounced"]:
+        return
+
+    # Find the message in the database
+    message = Message.objects.filter(message_id=event.message_id).get()
+
+    # Modify the message
+    message.status = {
+        "delivered": MessageStatus.SENT,
+        "rejected": MessageStatus.FAILED,
+        "bounced": MessageStatus.FAILED,
+    }[event.event_type]
+    message.save()

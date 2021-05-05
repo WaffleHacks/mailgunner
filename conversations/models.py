@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils import timezone
+from django.utils.translation import gettext_lazy
 from django_better_admin_arrayfield.models.fields import ArrayField
 from os import path
 from uuid import uuid4
@@ -27,10 +28,14 @@ class Thread(models.Model):
     """
 
     # Who the thread is assigned to
-    assignee = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, blank=True, null=True)
+    assignee = models.ForeignKey(
+        get_user_model(), on_delete=models.CASCADE, blank=True, null=True
+    )
 
     # The category the message is in
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, blank=True, null=True)
+    category = models.ForeignKey(
+        Category, on_delete=models.CASCADE, blank=True, null=True
+    )
 
     # The subject line of the original message
     subject = models.CharField(max_length=255)
@@ -70,6 +75,18 @@ class MessageType(models.IntegerChoices):
     OUTGOING = 1
 
 
+class MessageStatus(models.IntegerChoices):
+    """
+    The status of the message as reported by MailGun
+    """
+
+    PENDING = 0, gettext_lazy("Waiting to send...")
+    SENT = 1, gettext_lazy("Successfully sent")
+    FAILED = 2, gettext_lazy("Failed to send")
+
+    __empty__ = gettext_lazy("N/A")
+
+
 class Message(models.Model):
     """
     A message that was either sent or received
@@ -106,6 +123,9 @@ class Message(models.Model):
     message_id = models.CharField(max_length=256)
     thread = models.ForeignKey(Thread, on_delete=models.CASCADE, blank=True, null=True)
 
+    # The current status of the message as reported by MailGun
+    status = models.IntegerField(choices=MessageStatus.choices, null=True)
+
     def __str__(self):
         return f'<Message pk={self.pk} sender_email="{self.sender_email}" timestamp="{self.timestamp}">'
 
@@ -115,6 +135,12 @@ class Message(models.Model):
         """
         difference = timezone.now() - self.timestamp
         return difference.days >= 1
+
+    def get_status(self):
+        """
+        Convert the status integer to a human readable value
+        """
+        return MessageStatus(self.status).label if self.status is not None else None
 
     class Meta:
         ordering = ["-timestamp"]
