@@ -212,3 +212,12 @@ CELERY_TIMEZONE = TIME_ZONE
 CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_ACCEPT_CONTENT = ["json"]
+
+# Authlib Discord provider configuration
+DISCORD_GUILD_ID = environ.get("DISCORD_GUILD_ID")
+AUTHLIB_OAUTH_CLIENTS = {
+    "discord": {
+        "client_id": environ.get("DISCORD_CLIENT_ID"),
+        "client_secret": environ.get("DISCORD_CLIENT_SECRET"),
+    }
+}

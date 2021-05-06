@@ -4,9 +4,9 @@ from . import views
 
 app_name = "account"
 urlpatterns = [
-    path("forgot", views.forgot_password, name="forgot"),
-    path("reset/<str:uid>/<str:token>", views.reset_password, name="reset"),
     path("login", views.login_view, name="login"),
+    path("oauth/start", views.start_login, name="oauth_start"),
+    path("oauth/authorize", views.finish_login, name="oauth_finish"),
     path("settings", views.settings, name="settings"),
     path("logout", views.logout_view, name="logout"),
 ]

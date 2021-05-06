@@ -3,26 +3,6 @@
 {% block title %}Login{% endblock %}
 
 {% block content %}
-    <h1 class="h4 mb-3 fw-normal">Please sign in</h1>
-
-    <form action="{% url 'account:login' %}" method="post">
-        {% csrf_token %}
-        {% if request.GET.next %}
-            <input type="hidden" name="next" value="{{ request.GET.next }}">
-        {% endif %}
-
-        <div class="form-floating">
-            <input type="text" id="username" name="username" class="form-control round-top" placeholder="Username" required>
-            <label for="username">Username</label>
-        </div>
-
-        <div class="form-floating">
-            <input type="password" id="password" name="password" class="form-control round-bottom" placeholder="Password" required>
-            <label for="password">Password</label>
-        </div>
-
-        <a href="{% url 'account:forgot' %}" class="link-secondary mt-3">Forgot your password?</a>
-
-        <input class="w-100 btn btn-lg btn-primary mt-3" type="submit" value="Sign in">
-    </form>
+    <h1 class="h4 mb-3 fw-normal">Please sign in with Discord</h1>
+    <a class="w-100 btn btn-lg btn-primary mt-3" href="{% url 'account:oauth_start' %}">Sign in</a>
 {% endblock %}
