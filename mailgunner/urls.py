@@ -25,8 +25,6 @@ urlpatterns = [
     path("account/", include("account.urls")),
     # conversations mail
     path("conversations/", include("conversations.urls")),
-    # external api,
-    path("external/", include("external.urls")),
     # schedule mail
     path("schedule/", include("schedule.urls")),
     # Routes from other packages

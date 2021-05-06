@@ -61,7 +61,6 @@ INSTALLED_APPS = [
     "whitenoise.runserver_nostatic",
     "account.apps.AuthenticationConfig",
     "conversations.apps.IncomingConfig",
-    "external.apps.ExternalConfig",
     "schedule.apps.ScheduleConfig",
     "django_better_admin_arrayfield",
     "django.contrib.admin",
@@ -201,9 +200,6 @@ admin_name = environ.get("ADMIN_NAME")
 admin_email = environ.get("ADMIN_EMAIL")
 if admin_name is not None and admin_email is not None:
     ADMINS.append((admin_name, admin_email))
-
-# Registration token to allow external registrations
-REGISTRATION_TOKEN = environ.get("REGISTRATION_TOKEN")
 
 # Celery configuration
 CELERY_BROKER_URL = environ.get("CELERY_BROKER_URL")
