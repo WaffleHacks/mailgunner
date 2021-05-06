@@ -56,7 +56,6 @@ def finish_login(request):
 
     # Get the user's info
     user_info = client.userinfo(token=token)
-    print(user_info, token)
 
     # Get all the user's guilds
     response = requests.get(
