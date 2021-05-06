@@ -7,6 +7,7 @@ from anymail.signals import (
 )
 from anymail.inbound import AnymailInboundMessage
 from anymail.message import AnymailStatus
+from django.conf import settings
 from django.core.mail import EmailMessage, EmailMultiAlternatives
 from django.core.files.uploadedfile import TemporaryUploadedFile
 from django.dispatch import receiver
@@ -85,11 +86,13 @@ def inbound_handler(event: AnymailInboundEvent, esp_name: str, **_unused):
     Receive inbound messages from MailGun
     """
     assert esp_name == "Mailgun"
+    message = event.message  # type: AnymailInboundMessage
 
-    # TODO: prevent reset emails from being stored
+    # Prevent reset emails from being stored
+    if message.envelope_sender == settings.DEFAULT_FROM_EMAIL:
+        return
 
     # Extract data from the message
-    message = event.message  # type: AnymailInboundMessage
     received = Message(
         type=MessageType.INCOMING,
         sender_email=message.envelope_sender,
@@ -141,6 +144,10 @@ def post_send_handler(
     # Parse the emails
     [(from_name, from_email)] = getaddresses([message.from_email])
     [(_, recipient_email), *_] = getaddresses(message.to)
+
+    # Prevent reset emails from being stored
+    if from_email == settings.DEFAULT_FROM_EMAIL:
+        return
 
     # Get the HTML message if it exists
     html = None
