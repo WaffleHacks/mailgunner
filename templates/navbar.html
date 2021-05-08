@@ -17,7 +17,7 @@
                     <a class="nav-link" href="{% url 'schedule:queued' %}">Schedule</a>
                 </li>
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navDropdownToggle" data-bs-toggle="dropdown" aria-expanded="false">{{ user.get_username }}</a>
+                    <a class="nav-link dropdown-toggle" href="#" id="navDropdownToggle" data-bs-toggle="dropdown" aria-expanded="false">{{ user.profile.preferred_username }}</a>
                     <ul class="dropdown-menu" aria-labelledby="navDropdownToggle">
                         {% if user.is_staff %}<li><a class="dropdown-item" href="{% url 'admin:index' %}">Admin</a></li>{% endif%}
                         <li><a class="dropdown-item" href="{% url 'account:settings' %}">Settings</a></li>

@@ -5,7 +5,7 @@ from typing import Dict
 def normalize_userinfo(_client, data: Dict[str, str]) -> Dict[str, str]:
     return {
         "id": data["id"],
-        "username": data["username"] + "." + data["discriminator"],
+        "username": data["username"] + "#" + data["discriminator"],
         "email": data["email"],
     }
 

@@ -7,8 +7,8 @@
         <div class="card-body">
             <h3 class="card-title">Settings</h3>
             <p>
-                You can change your username, email, name, and password here.
-                Keep in mind: if you change your password, you will have to login again.
+                You can change your preferred username and name here.
+                Your preferred username will be used when you are composing and replying to threads.
             </p>
         </div>
     </div>
@@ -36,11 +36,19 @@
                 <div class="row mb-3">
                     <div class="col-md">
                         <div class="form-floating">
+                            <input type="text" class="form-control" id="preferred-username" name="preferred_username" placeholder="{{ user.profile.preferred_username }}" value="{{ user.profile.preferred_username }}">
+                            <label for="preferred-username">Preferred Username</label>
+                        </div>
+                    </div>
+                    <div class="col-md">
+                        <div class="form-floating">
                             <input type="text" class="form-control" id="username" name="username" placeholder="{{ user.username }}" value="{{ user.username }}" disabled>
                             <label for="username">Username</label>
                         </div>
                     </div>
-                    <div class="col-md">
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
                         <div class="form-floating">
                             <input type="email" class="form-control" id="email" name="email" placeholder="{{ user.email }}" value="{{ user.email }}" disabled>
                             <label for="email">Email</label>

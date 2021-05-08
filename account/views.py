@@ -6,6 +6,7 @@ from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.shortcuts import redirect, render, resolve_url
 import requests
 
+from .models import Profile
 from .oauth import get_discord_client
 
 MANAGE_SERVER_PERMISSION = 0x20
@@ -96,6 +97,8 @@ def finish_login(request):
         user = User(username=user_info["username"], email=user_info["email"])
         user.set_unusable_password()
         user.save()
+        profile = Profile(user=user, preferred_username=user.username.replace("#", "."))
+        profile.save()
 
     # Login the user
     login(request, user)
@@ -127,14 +130,21 @@ def settings(request):
     # Change general settings logic
     first_name = request.POST.get("first_name")
     last_name = request.POST.get("last_name")
+    preferred_username = request.POST.get("preferred_username")
 
     # Only modify parameters if non-null and are different than current
-    if first_name is not None and first_name != request.user.first_name:
+    if first_name is not None and first_name != user.first_name:
         user.first_name = first_name
     if last_name is not None and last_name != user.last_name:
         user.last_name = last_name
+    if (
+        preferred_username is not None
+        and preferred_username != user.profile.preferred_username
+    ):
+        user.profile.preferred_username = preferred_username
 
     # Save the changes
+    user.profile.save()
     user.save()
 
     return redirect("account:settings")
