@@ -90,14 +90,12 @@ def finish_login(request):
 
     # Get the user or register them
     try:
-        user = User.objects.filter(
-            username=user_info["username"], email=user_info["email"]
-        ).get()
+        user = User.objects.filter(username=user_info["id"]).get()
     except User.DoesNotExist:
-        user = User(username=user_info["username"], email=user_info["email"])
+        user = User(username=user_info["id"], email=user_info["email"])
         user.set_unusable_password()
         user.save()
-        profile = Profile(user=user, preferred_username=user.username.replace("#", "."))
+        profile = Profile(user=user, preferred_username=user_info["username"])
         profile.save()
 
     # Login the user
