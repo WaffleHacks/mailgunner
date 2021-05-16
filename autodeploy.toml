@@ -1,0 +1,19 @@
+[[deploy]]
+action = "command"
+command = "poetry"
+args = ["run", "python", "manage.py", "migrate"]
+
+[[deploy]]
+action = "command"
+command = "poetry"
+args = ["run", "python", "manage.py", "collectstatic", "--no-input"]
+
+[[deploy]]
+action = "command"
+command = "systemctl"
+args = ["restart", "mailgunner.service"]
+
+[[deploy]]
+action = "command"
+command = "systemctl"
+args = ["restart", "mailgunner-celery.service"]
