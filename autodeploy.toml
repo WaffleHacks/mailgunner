@@ -1,11 +1,11 @@
 [[deploy]]
 action = "command"
-command = "poetry"
+command = "/etc/poetry/bin/poetry"
 args = ["run", "python", "manage.py", "migrate"]
 
 [[deploy]]
 action = "command"
-command = "poetry"
+command = "/etc/poetry/bin/poetry"
 args = ["run", "python", "manage.py", "collectstatic", "--no-input"]
 
 [[deploy]]
