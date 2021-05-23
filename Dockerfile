@@ -60,15 +60,21 @@ RUN SECRET_KEY=assets python manage.py collectstatic --no-input
 # Assemble all the previous images
 FROM base as assembled
 
+# Add a new user to run as
+RUN adduser --disabled-password app
+
 # Copy project files
-COPY --from=builder /mailgunner /mailgunner
+COPY --chown=app --from=builder /mailgunner/ /mailgunner/
 
 # Remove unused files
 RUN rm -rf requirements.txt static
 
 # Copy built files
-COPY --from=builder /dependencies /usr/local
-COPY --from=static-assets /mailgunner/staticfiles ./staticfiles
+COPY --chown=app --from=builder /dependencies /usr/local
+COPY --chown=app --from=static-assets /mailgunner/staticfiles ./staticfiles
+
+# Change the current user
+USER app
 
 
 ###
