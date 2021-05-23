@@ -173,8 +173,8 @@ ANYMAIL = {
     "WEBHOOK_SECRET": environ.get("WEBHOOK_SECRET"),
 }
 EMAIL_BACKEND = "anymail.backends.mailgun.EmailBackend"
-DEFAULT_FROM_EMAIL = "no-reply@" + environ.get("MAILGUN_DOMAIN")
-SERVER_EMAIL = "mailgunner@" + environ.get("MAILGUN_DOMAIN")
+DEFAULT_FROM_EMAIL = "no-reply@" + environ.get("MAILGUN_DOMAIN", "")
+SERVER_EMAIL = "mailgunner@" + environ.get("MAILGUN_DOMAIN", "")
 
 # Login redirects
 LOGIN_URL = "account:login"
