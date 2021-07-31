@@ -202,8 +202,8 @@ if admin_name is not None and admin_email is not None:
     ADMINS.append((admin_name, admin_email))
 
 # Celery configuration
-CELERY_BROKER_URL = environ.get("CELERY_BROKER_URL")
-CELERY_RESULT_BACKEND = environ.get("CELERY_RESULT_BACKEND")
+CELERY_BROKER_URL = environ.get("REDIS_URL")
+CELERY_RESULT_BACKEND = environ.get("REDIS_URL")
 CELERY_TIMEZONE = TIME_ZONE
 CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
