@@ -13,7 +13,8 @@ Django = "^3.2"
 django-anymail = {extras = ["mailgun"], version = "^8.2"}
 django-better-admin-arrayfield = "^1.4.2"
 django-storages = "^1.11.1"
-psycopg2 = "^2.8.6"
+psycopg2 = { version = "^2.8.6", markers = "sys_platform == 'linux'" }
+psycopg2-binary = { version = "^2.8.6", markers = "sys_platform != 'linux'" }
 python-dotenv = "^0.15.0"
 python-magic = "^0.4.18"
 whitenoise = "^5.2.0"
