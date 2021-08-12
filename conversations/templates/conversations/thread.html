@@ -18,6 +18,11 @@
     <div class="card w-100 h-100">
         <div class="card-body align-self-center mt-1">
             <a class="btn btn-primary" href="{% url 'conversations:reply' thread.pk %}">Reply</a>
+            {% if  thread.unread %}
+                <a class="btn btn-success" href="{% url 'conversations:toggle_unread' thread.pk %}">Mark Read</a>
+            {% else %}
+                <a class="btn btn-outline-warning" href="{% url 'conversations:toggle_unread' thread.pk %}">Mark Unread</a>
+            {% endif %}
             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#change-category-modal">Change Category</button>
             {% if not thread.assignee %}
                 <a class="btn btn-success" href="{% url 'conversations:claim' thread.pk %}">Claim</a>
