@@ -11,6 +11,7 @@ urlpatterns = [
     path("threads/<int:pk>/reply", views.reply, name="reply"),
     path("threads/<int:pk>/assign", views.claim, name="claim"),
     path("threads/<int:pk>/unassign", views.unclaim, name="unclaim"),
+    path("threads/<int:pk>/toggle", views.toggle_unread, name="toggle_unread"),
     path(
         "threads/<int:pk>/change-category",
         views.change_category,

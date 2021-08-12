@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
+from django.http import request
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic import DetailView
 
@@ -63,8 +64,10 @@ class ThreadView(LoginRequiredMixin, DetailView):
             return redirect("conversations:index")
 
         # Mark it as read
-        thread.unread = False
-        thread.save()
+        last_toggled = self.request.session.get("last_toggle_unread")
+        if last_toggled != thread.pk:
+            thread.unread = False
+            thread.save()
 
         return thread
 
@@ -119,6 +122,22 @@ def unclaim(request, pk):
     thread.save()
 
     messages.success(request, "Successfully unclaimed this thread!")
+    return redirect("conversations:thread", pk=pk)
+
+
+@login_required
+def toggle_unread(request, pk):
+    thread = get_object_or_404(Thread, pk=pk)
+
+    thread.unread = not thread.unread
+    thread.save()
+    request.session["last_toggle_unread"] = pk
+
+    if thread.unread:
+        status = "unread"
+    else:
+        status = "read"
+    messages.success(request, f"Successfully marked this thread as {status}!")
     return redirect("conversations:thread", pk=pk)
 
 
