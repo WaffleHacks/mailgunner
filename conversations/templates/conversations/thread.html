@@ -73,11 +73,11 @@
                 <script type="text/plain" id="summernote-content-{{ message.id }}">{{ message.html|safe }}</script>
             </div>
             <div class="card-footer">
-                {% with attachments=message.attachment_.all %}
+                {% with attachments=message.attachment_set.all %}
                     {% if attachments|length != 0 %}
-                        <ul class="list-group list-group-flush">
+                        <ul class="list-group list-group-flush mb-2">
                             {% for attachment in attachments %}
-                                <li class="list-group-item">
+                                <li class="list-group-item rounded-3 my-1">
                                     {% if attachment.inline %}
                                         <span class="badge bg-success">Inline</span>
                                     {% endif %}
