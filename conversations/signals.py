@@ -225,7 +225,10 @@ def tracking_handler(event: AnymailTrackingEvent, esp_name: str, **_unused):
         return
 
     # Find the message in the database
-    message = Message.objects.filter(message_id=event.message_id).get()
+    try:
+        message = Message.objects.filter(message_id=event.message_id).get()
+    except Message.DoesNotExist:
+        return
 
     # Modify the message
     message.status = {
