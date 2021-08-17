@@ -221,13 +221,16 @@ def tracking_handler(event: AnymailTrackingEvent, esp_name: str, **_unused):
     assert esp_name == "Mailgun"
 
     # Ensure the event is handleable
-    if event.event_type in ["delivered", "rejected", "bounced"]:
-        message = Message.objects.filter(message_id=event.message_id).get()
+    if event.event_type not in ["delivered", "rejected", "bounced"]:
+        return
 
-        # Modify the message
-        message.status = {
-            "delivered": MessageStatus.SENT,
-            "rejected": MessageStatus.FAILED,
-            "bounced": MessageStatus.FAILED,
-        }[event.event_type]
-        message.save()
+    # Find the message in the database
+    message = Message.objects.filter(message_id=event.message_id).get()
+
+    # Modify the message
+    message.status = {
+        "delivered": MessageStatus.SENT,
+        "rejected": MessageStatus.FAILED,
+        "bounced": MessageStatus.FAILED,
+    }[event.event_type]
+    message.save()
