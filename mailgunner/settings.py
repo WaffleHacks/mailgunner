@@ -196,13 +196,6 @@ MESSAGE_TAGS = {
     messages.ERROR: "danger",
 }
 
-# Load application admins
-ADMINS = []
-admin_name = environ.get("ADMIN_NAME")
-admin_email = environ.get("ADMIN_EMAIL")
-if admin_name is not None and admin_email is not None:
-    ADMINS.append((admin_name, admin_email))
-
 # Celery configuration
 CELERY_BROKER_URL = environ.get("REDIS_URL")
 CELERY_RESULT_BACKEND = environ.get("REDIS_URL")
