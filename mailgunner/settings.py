@@ -16,6 +16,8 @@ from dotenv import load_dotenv
 from json import loads as parse_json
 from os import environ
 from pathlib import Path
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
 
 # Load .env file
 load_dotenv()
@@ -217,3 +219,13 @@ AUTHLIB_OAUTH_CLIENTS = {
         "client_secret": environ.get("DISCORD_CLIENT_SECRET"),
     }
 }
+
+# Integrate Sentry
+SENTRY_DSN = environ.get("SENTRY_DSN")
+sentry_sdk.init(
+    dsn=SENTRY_DSN,
+    integrations=[DjangoIntegration()],
+    traces_sample_rate=0.5,
+    environment="development" if DEBUG else "production",
+    send_default_pii=True,
+)
