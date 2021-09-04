@@ -16,6 +16,8 @@ from dotenv import load_dotenv
 from json import loads as parse_json
 from os import environ
 from pathlib import Path
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
 
 # Load .env file
 load_dotenv()
@@ -194,13 +196,6 @@ MESSAGE_TAGS = {
     messages.ERROR: "danger",
 }
 
-# Load application admins
-ADMINS = []
-admin_name = environ.get("ADMIN_NAME")
-admin_email = environ.get("ADMIN_EMAIL")
-if admin_name is not None and admin_email is not None:
-    ADMINS.append((admin_name, admin_email))
-
 # Celery configuration
 CELERY_BROKER_URL = environ.get("REDIS_URL")
 CELERY_RESULT_BACKEND = environ.get("REDIS_URL")
@@ -217,3 +212,13 @@ AUTHLIB_OAUTH_CLIENTS = {
         "client_secret": environ.get("DISCORD_CLIENT_SECRET"),
     }
 }
+
+# Integrate Sentry
+SENTRY_DSN = environ.get("SENTRY_DSN")
+sentry_sdk.init(
+    dsn=SENTRY_DSN,
+    integrations=[DjangoIntegration()],
+    traces_sample_rate=0.5,
+    environment="development" if DEBUG else "production",
+    send_default_pii=True,
+)
